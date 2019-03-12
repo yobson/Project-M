@@ -5,6 +5,7 @@ import System.IO
 import qualified System.IO.Strict as SIO
 import Database.Redis
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Char8 as BC
 import System.IO.Unsafe
 
 magicProjectList = "/tmp/projectList.txt"
@@ -22,10 +23,10 @@ type Project = (Name, Discription, URL)
 newtype ProjType = ProjectType (Name, Discription, URL) deriving (Read, Show)
 
 data Event = RegUser | GetTasks deriving (Show, Read)
-data Returns = UserID Integer String String | ProjectList [Project] | Nout deriving (Show, Read)
+data Returns = UserID Integer String String Integer | ProjectList [Project] | Nout deriving (Show, Read)
 
 instance JSON Returns where
-  jsonify (UserID id fstN sndN) = "{\"userID\" : \"" ++ show id ++ "\",\"firstName\" : " ++ show fstN ++ ",\"lastName\" : " ++ show sndN ++ "}"
+  jsonify (UserID id fstN sndN scr) = "{\"userID\" : " ++ show id ++ ",\"firstName\" : " ++ show fstN ++ ",\"lastName\" : " ++ show sndN ++ ",\"score\" : " ++ show scr ++ "}"
   jsonify (ProjectList ps)      = concat ["{\"projects\" : [", commaConcat $ map (jsonify . ProjectType) ps, "] }"]
   jsonify (Nout)                = "{}"
 
@@ -47,11 +48,16 @@ findInput xs s = (safeHead $ filter (\(a,_) -> a == s) xs) >>= return . snd
         safeHead (x:xs) = Just x
 
 getNewUserID :: IO (Maybe Integer)
-getNewUserID= connect defaultConnectInfo >>= (\conn -> runRedis conn $ do
+getNewUserID = connect defaultConnectInfo >>= (\conn -> runRedis conn $ do
     id <- incr "user:id"
     liftIO $ return id) >>= maybify
   where maybify (Left _ ) = return Nothing
         maybify (Right i) = return $ Just i
+
+setUser :: Integer -> String -> String -> Integer -> IO ()
+setUser id fname sname score = connect defaultConnectInfo >>= (\conn -> runRedis conn $ do
+    set (B.concat ["user:",BC.pack $ show id]) (BC.concat [BC.pack fname, ", ", BC.pack sname, ", ", BC.pack $ show score])) >> return ()
+
 
 maybeIO :: IO (Maybe a) -> Maybe (IO a)
 maybeIO a = unsafePerformIO a >>= return . return
@@ -63,7 +69,7 @@ act ins RegUser  = do
                     fstN <- get "firstName"
                     sndN <- get "secondName"
                     ioID <- maybeIO getNewUserID
-                    return $ ioID >>= \id -> return (UserID id fstN sndN)
+                    return $ ioID >>= \id -> setUser id fstN sndN 0 >> return (UserID id fstN sndN 0)
 act _   GetTasks = Just $ getProjects >>= return . ProjectList
 
 act' :: Maybe Event -> [Input] -> IO Returns
