@@ -6,6 +6,7 @@ import qualified System.IO.Strict as SIO
 import Database.Redis
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
+import System.IO.Unsafe
 
 magicProjectList = "/tmp/projectList.txt"
 
@@ -22,7 +23,7 @@ type Project = (Name, Discription, URL)
 newtype ProjType = ProjectType (Name, Discription, URL) deriving (Read, Show)
 
 data Event = RegUser | GetTasks deriving (Show, Read)
-data Returns = UserID Int String String | ProjectList [Project] | Nout deriving (Show, Read)
+data Returns = UserID Integer String String | ProjectList [Project] | Nout deriving (Show, Read)
 
 instance JSON Returns where
   jsonify (UserID id fstN sndN) = "{\"userID\" : \"" ++ show id ++ "\",\"firstName\" : " ++ show fstN ++ ",\"lastName\" : " ++ show sndN ++ "}"
@@ -46,12 +47,24 @@ findInput xs s = (safeHead $ filter (\(a,_) -> a == s) xs) >>= return . snd
   where safeHead []     = Nothing
         safeHead (x:xs) = Just x
 
+getNewUserID :: IO (Maybe Integer)
+getNewUserID= connect defaultConnectInfo >>= (\conn -> runRedis conn $ do
+    id <- incr "user:id"
+    liftIO $ return id) >>= maybify
+  where maybify (Left _ ) = return Nothing
+        maybify (Right i) = return $ Just i
+
+maybeIO :: IO (Maybe a) -> Maybe (IO a)
+maybeIO a = unsafePerformIO a >>= return . return
+
+
 act :: [Input] -> Event -> Maybe (IO Returns)
 act ins RegUser  = do
                     let get = findInput ins
                     fstN <- get "firstName"
                     sndN <- get "secondName"
-                    return $ return (UserID 10 fstN sndN)
+                    ioID <- maybeIO getNewUserID
+                    return $ ioID >>= \id -> return (UserID id fstN sndN)
 act _   GetTasks = Just $ getProjects >>= return . ProjectList
 
 act' :: Maybe Event -> [Input] -> IO Returns
