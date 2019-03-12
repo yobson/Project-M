@@ -5,7 +5,6 @@ import System.IO
 import qualified System.IO.Strict as SIO
 import Database.Redis
 import qualified Data.ByteString as B
-import qualified Data.ByteString.Char8 as BC
 import System.IO.Unsafe
 
 magicProjectList = "/tmp/projectList.txt"
