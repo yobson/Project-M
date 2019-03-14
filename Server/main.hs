@@ -28,9 +28,9 @@ data Returns = UserID Integer String String Integer | ProjectList [Project] | No
 data User = User Integer String String Integer deriving (Read, Show)
 
 -- Not gonna lie... This was a crazy cool idea to nest monadic binds. Might change notation later
-(<>>=>) :: (Monad m1, Monad m2) => m1 (m2 a) -> (a -> m2 b) -> m1 (m2 b)
-m <>>=> f = fmap (>>= f) m
-infixl 1 <>>=>
+([>>=]) :: (Monad m1, Monad m2) => m1 (m2 a) -> (a -> m2 b) -> m1 (m2 b)
+m [>>=] f = fmap (>>= f) m
+infixl 1 [>>=]
 
 instance JSON Returns where
   jsonify (UserID id fstN sndN scr) = "{\"userID\" : " ++ show id ++ ",\"firstName\" : " ++ show fstN ++ ",\"lastName\" : " ++ show sndN ++ ",\"score\" : " ++ show scr ++ "}"
@@ -85,7 +85,7 @@ act ins RegUser  = do
                     ioID <- maybeIO getNewUserID
                     return $ ioID >>= \id -> setUser id fstN sndN 0 >> return (UserID id fstN sndN 0)
 act _   GetTasks = Just $ getProjects >>= return . ProjectList
-act ins GetUser = findInput ins "id" >>= maybeIO . getUser . read <>>=> return . isoUser
+act ins GetUser = findInput ins "id" >>= maybeIO . getUser . read [>>=] return . isoUser
   where isoUser (User id f s score) = UserID id f s score
 
 
