@@ -16,8 +16,11 @@ import qualified Data.ByteString.Char8 as BC
 import System.IO.Unsafe
 import Text.Read (readMaybe)
 
+([>>=]) :: (Monad m1, Monad m2) => m1 (m2 a) -> (a -> m2 b) -> m1 (m2 b)
+m [>>=] f = fmap (>>= f) m
+infixl 1 [>>=]
 
-data Event a = RequestJS | RequestInput | ReturnAns a | ShowProject deriving (Read, Show)
+data Event a = RequestJS | RequestInput | ReturnAns Int a | ShowProject deriving (Read, Show)
 data Result = Send String | Yeet deriving (Show)
 
 type Input = (String, String)
