@@ -2,7 +2,8 @@
 -- so that each project simply provides a transformation from state to state dependne on event.
 module ProjectM (
       Event (..),
-      runSite
+      runSite,
+      Result
 ) where
 
 {-# LANGUAGE OverloadedStrings #-}
