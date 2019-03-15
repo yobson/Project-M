@@ -16,15 +16,16 @@ import qualified Data.ByteString.Char8 as BC
 import System.IO.Unsafe
 import Text.Read (readMaybe)
 
-([>>=]) :: (Monad m1, Monad m2) => m1 (m2 a) -> (a -> m2 b) -> m1 (m2 b)
-m [>>=] f = fmap (>>= f) m
-infixl 1 [>>=]
+(|>>=|) :: (Monad m1, Monad m2) => m1 (m2 a) -> (a -> m2 b) -> m1 (m2 b)
+m |>>=| f = fmap (>>= f) m
+infixl 1 |>>=|
 
 data Event a = RequestJS | RequestInput | ReturnAns Int a | ShowProject deriving (Read, Show)
 data Result = Send String | Yeet deriving (Show)
 
 type Input = (String, String)
-type Updater a b = a -> Event b -> Maybe (a, Result)
+type Updater a b = a -> Event b -> (a, Result)
+type DBName = String
 
 findInput :: [Input] -> String -> Maybe String
 findInput xs s = (safeHead $ filter (\(a,_) -> a == s) xs) >>= return . snd
@@ -34,18 +35,29 @@ findInput xs s = (safeHead $ filter (\(a,_) -> a == s) xs) >>= return . snd
 findInputM :: (Monad m) => [Input] -> String -> m (Maybe String)
 findInputM ins = return . findInput ins
 
-parseEvent :: (Read a) => Maybe String -> Maybe (Event a)
-parseEvent s = s >>= readMaybe
+blitResult :: (Monad m) => Maybe (a, Result) -> m Result
+blitResult (Just (_,r)) = return r
+blitResult Nothing      = return Yeet
 
-runEvent :: (Monad m) => Updater a b -> a -> Maybe (Event b) -> m (Maybe (a, Result))
-runEvent u i me = return (me >>= u i)
+cgiMain :: (Read b) => Updater a b -> Maybe a -> CGI CGIResult
+cgiMain u init = getInputs >>= flip findInputM "event" |>>=| readMaybe |>>=| (\e -> (init >>= \i -> return (u i e))) >>= blitResult >>= return . show >>= output
 
-getResult :: (Monad m) => Maybe (a, Result) -> m Result
-getResult (Just (_,r)) = return r
-getResult Nothing      = return Yeet
+existsDB :: String -> IO (Bool)
+existsDB db = connect defaultConnectInfo >>= (\conn -> runRedis conn (exists $ BC.pack db)) >>= normalize
+    where normalize (Left _)  = return False
+          normalize (Right i) = return i
 
-cgiMain :: (Read b) => Updater a b -> a -> CGI CGIResult
-cgiMain u init = getInputs >>= flip findInputM "event" >>= return . parseEvent >>= runEvent u init >>= getResult >>= return . show >>= output
+getState :: (Read a) => String -> a -> IO (Maybe a)
+getState db _ = connect defaultConnectInfo >>= (\conn -> runRedis conn (blpop [BC.pack db] 0)) >>= normalize |>>=| readMaybe . BC.unpack . snd
+    where normalize (Left _)  = return Nothing
+          normalize (Right i) = return i
 
-runSite :: (Read a, Read b, Show a) => Updater a b -> a -> IO ()
-runSite update init = runCGI (handleErrors $ cgiMain update init)
+setState :: (Show a) => String -> a -> IO (Maybe a)
+setState db s = connect defaultConnectInfo >>= (\conn -> runRedis conn (lpush (BC.pack db) [BC.pack $ show s])) >> return (Just s)
+
+branch :: (a -> b) -> (a -> b) -> Bool -> (a -> b)
+branch f _ True  = f
+branch _ f False = f
+
+runSite :: (Read a, Read b, Show a) => DBName -> Updater a b -> a -> IO ()
+runSite db update init = existsDB db >>= \p -> branch (getState db) (setState db) p init >>= \i ->  runCGI (handleErrors $ cgiMain update i)
