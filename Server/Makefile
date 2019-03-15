@@ -2,6 +2,8 @@ TARGETS = main.cgi
 
 all : $(TARGETS)
 
+primes : all Primes.cgi
+
 CC = ghc
 
 %.cgi : %.hs

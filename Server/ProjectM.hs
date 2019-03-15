@@ -3,7 +3,8 @@
 module ProjectM (
       Event (..),
       runSite,
-      Result
+      Result (..),
+      Updater
 ) where
 
 {-# LANGUAGE OverloadedStrings #-}
