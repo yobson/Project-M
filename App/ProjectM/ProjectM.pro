@@ -26,13 +26,16 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    registration.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    registration.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    registration.ui
 
 CONFIG += mobility
 MOBILITY = 
