@@ -22,14 +22,14 @@ JSExecEngine::~JSExecEngine()
 
 void JSExecEngine::exists_user(QString *userID)
 {
-    nethub_poll *instruct = new nethub_poll();
-    instruct->queryType = getUser;
-    instruct->userID = userID;
-    instruct->returnSignal = existsUser;
-    buildRequest(instruct);
-    QNetworkReply *reply = netHub->get(*instruct->request);
-    connect(reply, &QNetworkReply::finished, this, [reply, instruct,this](){this->parseReturn(reply, instruct);});
-    netHub->get(*instruct->request);
+    nethub_poll *instr = new nethub_poll();
+    instr->queryType = getUser;
+    instr->userID = userID;
+    instr->returnSignal = existsUser;
+    buildRequest(instr);
+    QNetworkReply *reply = netHub->get(*instr->request);
+    connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
+    netHub->get(*instr->request);
 }
 
 bool JSExecEngine::standardEnd(QString *check)
@@ -62,12 +62,12 @@ void JSExecEngine::buildRequest(JSExecEngine::nethub_poll *inst)
     }
 }
 
-void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instruct)
+void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
 { //Needs a test
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray data = reply->readAll();
-        if (instruct == nullptr) return;
-        switch(instruct->returnSignal) {
+        if (instr == nullptr) return;
+        switch(instr->returnSignal) {
         case existsUser : {
             if (data.startsWith("{}")) emit exists_user_result(false);
             else emit exists_user_result(true);
@@ -78,7 +78,7 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instruct)
     }
 
     reply->deleteLater();
-    deleteNethubPoll(instruct);
+    deleteNethubPoll(instr);
 }
 
 void JSExecEngine::deleteNethubPoll(JSExecEngine::nethub_poll *poll)
