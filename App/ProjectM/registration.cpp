@@ -21,6 +21,7 @@ void Registration::on_register_btn_clicked()
 {
     auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     auto fileName= path + "/userID";
+    //TODO: James -> Check user on server and link to main window
 }
 
 void Registration::on_skip_btn_clicked()

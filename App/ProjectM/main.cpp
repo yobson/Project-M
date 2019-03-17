@@ -5,6 +5,8 @@
 #include <QFileInfo>
 #include <QDebug>
 
+//TODO: James -> Move pretty much all of this code into registration.cpp or logging in window!
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -14,7 +16,7 @@ int main(int argc, char *argv[])
     QFileInfo checkFile(fileName);
     MainWindow   *wM = nullptr;
     Registration *wR = nullptr;
-    if (checkFile.exists() && checkFile.isFile()) {
+    if (checkFile.exists() && checkFile.isFile()) { //TODO: James -> Check user exists on server
         qDebug() << "No need to reg";
         wM = new MainWindow();
         wM->show();

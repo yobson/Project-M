@@ -12,3 +12,8 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_james_test_btn_clicked()
+{
+   //TODO: James -> Link to test page
+}

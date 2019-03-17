@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui qml network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,11 +27,13 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    registration.cpp
+    registration.cpp \
+    jsexecengine.cpp
 
 HEADERS += \
         mainwindow.h \
-    registration.h
+    registration.h \
+    jsexecengine.h
 
 FORMS += \
         mainwindow.ui \
