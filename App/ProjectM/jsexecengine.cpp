@@ -4,11 +4,11 @@
 #include <QUrlQuery>
 #include <QNetworkReply>
 
-JSExecEngine::JSExecEngine(QString *_baseURL, QString *_projExt, QObject *parent) : QObject(parent)
+JSExecEngine::JSExecEngine(QString _baseURL, QString _projExt, QObject *parent) : QObject(parent)
 {
-    baseURL = QString(*_baseURL + (standardEnd(_baseURL) ? "" : "/") + "cgi+bin/main.cgi");
-    projURL = QString(*_baseURL + (standardStart(_projExt) && !standardEnd(_baseURL) ? "/" : "") +
-                      "cgi-bin/" + *_projExt);
+    baseURL = QString(_baseURL + (standardEnd(&_baseURL) ? "" : "/") + "cgi+bin/main.cgi");
+    projURL = QString(_baseURL + (standardStart(&_projExt) && !standardEnd(&_baseURL) ? "/" : "") +
+                      "cgi-bin/" + _projExt);
     qDebug() << "Base URL: " << baseURL;
     qDebug() << "Project URL: " << projURL;
 
@@ -20,11 +20,11 @@ JSExecEngine::~JSExecEngine()
     netHub->deleteLater();
 }
 
-void JSExecEngine::exists_user(QString *userID)
+void JSExecEngine::exists_user(QString userID)
 {
     nethub_poll *instr = new nethub_poll();
     instr->queryType = getUser;
-    instr->userID = userID;
+    instr->userID = new QString(userID);
     instr->returnSignal = existsUser;
     buildRequest(instr);
     QNetworkReply *reply = netHub->get(*instr->request);
@@ -85,5 +85,6 @@ void JSExecEngine::deleteNethubPoll(JSExecEngine::nethub_poll *poll)
 {
     if (poll == nullptr) return;
     if (poll->request != nullptr) delete poll->request;
+    if (poll->userID != nullptr) delete poll->userID;
     delete poll;
 }

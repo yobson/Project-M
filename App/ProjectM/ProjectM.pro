@@ -28,16 +28,19 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     registration.cpp \
-    jsexecengine.cpp
+    jsexecengine.cpp \
+    loginwindow.cpp
 
 HEADERS += \
         mainwindow.h \
     registration.h \
-    jsexecengine.h
+    jsexecengine.h \
+    loginwindow.h
 
 FORMS += \
         mainwindow.ui \
-    registration.ui
+    registration.ui \
+    loginwindow.ui
 
 CONFIG += mobility
 MOBILITY = 

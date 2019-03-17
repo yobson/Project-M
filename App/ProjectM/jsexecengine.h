@@ -16,9 +16,9 @@ class JSExecEngine : public QObject
     Q_OBJECT
 
 public:
-    JSExecEngine(QString *_baseURL, QString *_projExt, QObject *parent = nullptr);
+    JSExecEngine(QString _baseURL, QString _projExt, QObject *parent = nullptr);
     ~JSExecEngine();
-    void exists_user(QString *userID);
+    void exists_user(QString userID);
 
 signals:
     void exists_user_result(bool existsUser);
@@ -31,7 +31,7 @@ private:
         query_type queryType = noQuery;
         return_signal returnSignal = noSignal;
         QNetworkRequest *request = nullptr;
-        QString *userID; //Assumed to be deleted by caller? TODO: James -> Check this
+        QString *userID = nullptr;
     } nethub_poll;
     QString baseURL; //URL of user managment server
     QString projURL; //URL of project CGI.
@@ -40,7 +40,7 @@ private:
     bool standardEnd(QString *check);
     bool standardStart(QString *check);
     void buildRequest(nethub_poll *inst);
-    void parseReturn(QNetworkReply *reply, nethub_poll *instruct);
+    void parseReturn(QNetworkReply *reply, nethub_poll *instr);
     void deleteNethubPoll(nethub_poll *poll);
 };
 
