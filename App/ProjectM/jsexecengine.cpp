@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QUrl>
 #include <QUrlQuery>
+#include <QNetworkReply>
 
 JSExecEngine::JSExecEngine(QString *_baseURL, QString *_projExt, QObject *parent) : QObject(parent)
 {
@@ -12,25 +13,22 @@ JSExecEngine::JSExecEngine(QString *_baseURL, QString *_projExt, QObject *parent
     qDebug() << "Project URL: " << projURL;
 
     netHub = new QNetworkAccessManager(this);
-    connect(netHub, &QNetworkAccessManager::finished, this, &JSExecEngine::parseReturn);
 }
 
 JSExecEngine::~JSExecEngine()
 {
     netHub->deleteLater();
-    if (instruct != nullptr) {
-        if (instruct->request != nullptr) delete instruct->request;
-        delete instruct;
-    }
 }
 
 void JSExecEngine::exists_user(QString *userID)
 {
-    instruct = new nethub_poll();
+    nethub_poll *instruct = new nethub_poll();
     instruct->queryType = getUser;
     instruct->userID = userID;
     instruct->returnSignal = existsUser;
     buildRequest(instruct);
+    QNetworkReply *reply = netHub->get(*instruct->request);
+    connect(reply, &QNetworkReply::finished, this, [reply, instruct,this](){this->parseReturn(reply, instruct);});
     netHub->get(*instruct->request);
 }
 
@@ -64,18 +62,28 @@ void JSExecEngine::buildRequest(JSExecEngine::nethub_poll *inst)
     }
 }
 
-void JSExecEngine::parseReturn(QNetworkReply *reply)
+void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instruct)
 { //Needs a test
-    QByteArray data = reply->readAll();
-    if (instruct == nullptr) return;
-    switch(instruct->returnSignal) {
-    case existsUser : {
+    if (reply->error() == QNetworkReply::NoError) {
+        QByteArray data = reply->readAll();
+        if (instruct == nullptr) return;
+        switch(instruct->returnSignal) {
+        case existsUser : {
             if (data.startsWith("{}")) emit exists_user_result(false);
             else emit exists_user_result(true);
             break;
         };
         case noSignal   : return;
+        }
     }
 
     reply->deleteLater();
+    deleteNethubPoll(instruct);
+}
+
+void JSExecEngine::deleteNethubPoll(JSExecEngine::nethub_poll *poll)
+{
+    if (poll == nullptr) return;
+    if (poll->request != nullptr) delete poll->request;
+    delete poll;
 }

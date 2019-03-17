@@ -31,21 +31,17 @@ private:
         query_type queryType = noQuery;
         return_signal returnSignal = noSignal;
         QNetworkRequest *request = nullptr;
-        QString *userID;
+        QString *userID; //Assumed to be deleted by caller? TODO: James -> Check this
     } nethub_poll;
     QString baseURL; //URL of user managment server
     QString projURL; //URL of project CGI.
     QNetworkAccessManager *netHub;
 
-    nethub_poll *instruct = nullptr;
-
-
     bool standardEnd(QString *check);
     bool standardStart(QString *check);
     void buildRequest(nethub_poll *inst);
-
-private slots:
-    void parseReturn(QNetworkReply *reply);
+    void parseReturn(QNetworkReply *reply, nethub_poll *instruct);
+    void deleteNethubPoll(nethub_poll *poll);
 };
 
 #endif // JSEXECENGINE_H
