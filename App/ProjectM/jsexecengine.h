@@ -19,19 +19,28 @@ public:
     JSExecEngine(QString _baseURL, QString _projExt, QObject *parent = nullptr);
     ~JSExecEngine();
     void exists_user(QString userID);
+    void register_user(QString firstName, QString lastName);
 
 signals:
-    void exists_user_result(bool existsUser);
+    void exists_user_result(bool);
+    void register_user_result(QString);
 
 private:
-    enum query_type {getUser, noQuery};
-    enum return_signal {existsUser, noSignal};
-    typedef struct
-    {
+    enum query_type {getUser, regUser, noQuery};
+    enum return_signal {existsUser, userReg, noSignal};
+    typedef struct {
+        QString firstName;
+        QString lastName;
+    } nethub_poll_data_names;
+    typedef union {
+        nethub_poll_data_names *names;
+    } nethub_poll_data;
+    typedef struct{
         query_type queryType = noQuery;
         return_signal returnSignal = noSignal;
         QNetworkRequest *request = nullptr;
         QString *userID = nullptr;
+        nethub_poll_data data;
     } nethub_poll;
     QString baseURL; //URL of user managment server
     QString projURL; //URL of project CGI.

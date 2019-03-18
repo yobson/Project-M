@@ -17,6 +17,7 @@ class LoginWindow : public QMainWindow
 public:
     explicit LoginWindow(QWidget *parent = nullptr);
     ~LoginWindow();
+    void checkLogin();
 
 private:
     Ui::LoginWindow *ui;

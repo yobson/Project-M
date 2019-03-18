@@ -2,6 +2,10 @@
 #include "ui_registration.h"
 #include <QStandardPaths>
 #include <QFileInfo>
+#include <QFile>
+#include <QTextStream>
+#include <QDebug>
+#include "magic.h"
 
 Registration::Registration(QWidget *parent) :
     QMainWindow(parent),
@@ -9,19 +13,22 @@ Registration::Registration(QWidget *parent) :
 {
     mainWindow = nullptr;
     ui->setupUi(this);
+    engine = new JSExecEngine(PROJECT_BASE_IP, "", this);
+    auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    fileName= path + "/userID.txt";
 }
 
 Registration::~Registration()
 {
     delete ui;
     if (mainWindow != nullptr) delete mainWindow;
+    if (engine != nullptr)     delete engine;
 }
 
 void Registration::on_register_btn_clicked()
 {
-    auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    auto fileName= path + "/userID";
-    //TODO: James -> Check user on server and link to main window
+    connect(engine, &JSExecEngine::register_user_result, this, &Registration::userRegistered);
+    engine->register_user(ui->fstName->text(), ui->sndName->text());
 }
 
 void Registration::on_skip_btn_clicked()
@@ -29,4 +36,21 @@ void Registration::on_skip_btn_clicked()
     mainWindow = new MainWindow();
     mainWindow->show();
     this->hide(); //To prevent back button returning to registration page!
+}
+
+void Registration::userRegistered(QString id)
+{
+    qDebug() << "user registered: " << id;
+    if (id == "") return; //TODO: James -> Error message?
+    QFileInfo checkFile(fileName);
+    if (checkFile.exists() && checkFile.isFile()) {
+        QFile file(fileName);
+        file.remove();
+    }
+    QFile file(fileName);
+    file.open(QIODevice::WriteOnly);
+    QTextStream stream(&file);
+    stream << id;
+    file.flush();
+    file.close();
 }

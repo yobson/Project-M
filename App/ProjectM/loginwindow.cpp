@@ -3,22 +3,14 @@
 #include <QStandardPaths>
 #include <QFileInfo>
 #include <QDebug>
+#include "magic.h"
+#include <QDir>
 
 LoginWindow::LoginWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::LoginWindow)
 {
     ui->setupUi(this);
-
-    auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation); //TODO: James -> Trigger this code after loop exec
-    auto fileName= path + "/userID";
-    QFileInfo checkFile(fileName);
-    if (checkFile.exists() && checkFile.isFile()) {
-        engine = new JSExecEngine("localhost:3000", "");
-        engine->exists_user("1000"); //TODO: James -> remove hardcode
-    } else {
-        existsUser(false);
-    }
 }
 
 LoginWindow::~LoginWindow()
@@ -42,4 +34,20 @@ void LoginWindow::existsUser(bool exists)
     }
     this->hide(); // prevent back button
 
+}
+
+void LoginWindow::checkLogin()
+{
+    auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation); //TODO: James -> Trigger this code after loop exec
+    auto fileName= path + "/userID.txt";
+    QDir dir(path);
+    if(!dir.exists()) dir.mkpath(".");
+    QFileInfo checkFile(fileName);
+    if (checkFile.exists() && checkFile.isFile()) {
+        engine = new JSExecEngine(PROJECT_BASE_IP, "");
+        engine->exists_user("1002"); //TODO: James -> remove hardcode
+        existsUser(true);
+    } else {
+        existsUser(false);
+    }
 }

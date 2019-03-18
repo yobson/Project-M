@@ -35,7 +35,8 @@ HEADERS += \
         mainwindow.h \
     registration.h \
     jsexecengine.h \
-    loginwindow.h
+    loginwindow.h \
+    magic.h
 
 FORMS += \
         mainwindow.ui \

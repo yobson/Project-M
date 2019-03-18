@@ -6,8 +6,8 @@
 
 JSExecEngine::JSExecEngine(QString _baseURL, QString _projExt, QObject *parent) : QObject(parent)
 {
-    baseURL = QString(_baseURL + (standardEnd(&_baseURL) ? "" : "/") + "cgi+bin/main.cgi");
-    projURL = QString(_baseURL + (standardStart(&_projExt) && !standardEnd(&_baseURL) ? "/" : "") +
+    baseURL = QString("http://" + _baseURL + (standardEnd(&_baseURL) ? "" : "/") + "cgi-bin/main.cgi");
+    projURL = QString("http://" + _baseURL + (standardStart(&_projExt) && !standardEnd(&_baseURL) ? "/" : "") +
                       "cgi-bin/" + _projExt);
     qDebug() << "Base URL: " << baseURL;
     qDebug() << "Project URL: " << projURL;
@@ -30,6 +30,23 @@ void JSExecEngine::exists_user(QString userID)
     QNetworkReply *reply = netHub->get(*instr->request);
     connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
     netHub->get(*instr->request);
+    qDebug() << "Started existance check";
+}
+
+void JSExecEngine::register_user(QString firstName, QString lastName)
+{
+    nethub_poll *instr = new nethub_poll();
+    instr->queryType = regUser;
+    instr->returnSignal = userReg;
+    nethub_poll_data_names *names = new nethub_poll_data_names;
+    names->firstName = QString(firstName);
+    names->lastName  = QString(lastName);
+    instr->data.names = names;
+    buildRequest(instr);
+    QNetworkReply *reply = netHub->get(*instr->request);
+    connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
+    qDebug() << "Started user registration: " << instr->request->url();
+
 }
 
 bool JSExecEngine::standardEnd(QString *check)
@@ -57,6 +74,16 @@ void JSExecEngine::buildRequest(JSExecEngine::nethub_poll *inst)
             inst->request = new QNetworkRequest(url);
             break;
         }
+        case regUser : {
+            QUrl url(baseURL);
+            QUrlQuery query;
+            query.addQueryItem("action","RegUser");
+            query.addQueryItem("firstName", inst->data.names->firstName);
+            query.addQueryItem("secondName", inst->data.names->lastName);
+            url.setQuery(query);
+            inst->request = new QNetworkRequest(url);
+            break;
+        }
         case noQuery : return;
 
     }
@@ -71,6 +98,11 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
         case existsUser : {
             if (data.startsWith("{}")) emit exists_user_result(false);
             else emit exists_user_result(true);
+            break;
+        };
+        case userReg : {
+            if (data.startsWith("{}")) emit register_user_result("");
+            else emit register_user_result("1000"); //TODO: James -> remove hardcode
             break;
         };
         case noSignal   : return;
