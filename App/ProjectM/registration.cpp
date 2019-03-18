@@ -41,7 +41,7 @@ void Registration::on_skip_btn_clicked()
 void Registration::userRegistered(QString id)
 {
     qDebug() << "user registered: " << id;
-    if (id == "") return; //TODO: James -> Error message?
+    if (id == "") {qDebug() << "User didn't register properly"; return;} //TODO: James -> GUI error message?
     QFileInfo checkFile(fileName);
     if (checkFile.exists() && checkFile.isFile()) {
         QFile file(fileName);

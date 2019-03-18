@@ -3,6 +3,8 @@
 #include <QUrl>
 #include <QUrlQuery>
 #include <QNetworkReply>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 JSExecEngine::JSExecEngine(QString _baseURL, QString _projExt, QObject *parent) : QObject(parent)
 {
@@ -29,8 +31,7 @@ void JSExecEngine::exists_user(QString userID)
     buildRequest(instr);
     QNetworkReply *reply = netHub->get(*instr->request);
     connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
-    netHub->get(*instr->request);
-    qDebug() << "Started existance check";
+    qDebug() << "Started existance check " << instr->request->url();
 }
 
 void JSExecEngine::register_user(QString firstName, QString lastName)
@@ -93,6 +94,7 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
 { //Needs a test
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray data = reply->readAll();
+        qDebug() << "returned: " << QString::fromUtf8(data);
         if (instr == nullptr) return;
         switch(instr->returnSignal) {
         case existsUser : {
@@ -101,8 +103,18 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
             break;
         };
         case userReg : {
-            if (data.startsWith("{}")) emit register_user_result("");
-            else emit register_user_result("1000"); //TODO: James -> remove hardcode
+            if (data.startsWith("{}")) {
+                emit register_user_result("");
+                return;
+            }
+            else {
+                QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(data).toUtf8());
+                QJsonObject obj;
+                if (doc.isNull() || !doc.isObject()) {emit register_user_result(""); qDebug() << "doc is null or not an object"; return;}
+                obj = doc.object();
+                qDebug() << "userID: " << obj["userID"];
+                emit register_user_result(QString::number(obj["userID"].toDouble()));
+            }
             break;
         };
         case noSignal   : return;
