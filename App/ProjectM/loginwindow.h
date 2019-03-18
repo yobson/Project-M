@@ -17,7 +17,9 @@ class LoginWindow : public QMainWindow
 public:
     explicit LoginWindow(QWidget *parent = nullptr);
     ~LoginWindow();
-    void checkLogin();
+
+signals:
+    void didFinishLoading();
 
 private:
     Ui::LoginWindow *ui;
@@ -27,6 +29,7 @@ private:
 
 private slots:
     void existsUser(bool exists);
+    void checkLogin();
 
 };
 

@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     LoginWindow w;
     w.show();
-    w.checkLogin();
 
+    qDebug() << "Starting event loop";
     return a.exec();
 }

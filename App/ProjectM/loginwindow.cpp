@@ -5,12 +5,17 @@
 #include <QDebug>
 #include "magic.h"
 #include <QDir>
+#include <QFile>
+#include <QTextStream>
+#include <QTimer>
 
 LoginWindow::LoginWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::LoginWindow)
 {
     ui->setupUi(this);
+    connect(this, &LoginWindow::didFinishLoading, this, &LoginWindow::checkLogin);
+    QTimer::singleShot(0, this, &LoginWindow::checkLogin); //Mega hack to wait for main exec loop #Qt hacks
 }
 
 LoginWindow::~LoginWindow()
@@ -38,15 +43,21 @@ void LoginWindow::existsUser(bool exists)
 
 void LoginWindow::checkLogin()
 {
-    auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation); //TODO: James -> Trigger this code after loop exec
-    auto fileName= path + "/userID.txt";
+    qDebug() << "Check login";
+    auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    auto fileName= path + "/userID.txt"; //TODO: James -> Add to magic strings
     QDir dir(path);
     if(!dir.exists()) dir.mkpath(".");
     QFileInfo checkFile(fileName);
     if (checkFile.exists() && checkFile.isFile()) {
+        qDebug() << "File exists";
         engine = new JSExecEngine(PROJECT_BASE_IP, "");
-        engine->exists_user("1002"); //TODO: James -> remove hardcode
-        existsUser(true);
+        connect(engine, &JSExecEngine::exists_user_result, this, &LoginWindow::existsUser);
+        QFile file(fileName);
+        file.open(QIODevice::ReadOnly);
+        QTextStream in(&file);
+        engine->exists_user(in.readLine());
+        file.close();
     } else {
         existsUser(false);
     }
