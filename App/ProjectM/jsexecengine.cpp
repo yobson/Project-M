@@ -7,15 +7,16 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-JSExecEngine::JSExecEngine(QString _baseURL, QString _projExt, QObject *parent) : QObject(parent)
+JSExecEngine::JSExecEngine(QString _baseURL, QString _projExt, QObject *parent, QPlainTextEdit *editor) : QObject(parent)
 {
     baseURL = QString("http://" + _baseURL + (standardEnd(&_baseURL) ? "" : "/") + "cgi-bin/main.cgi");
     projURL = QString("http://" + _baseURL + (standardStart(&_projExt) && !standardEnd(&_baseURL) ? "/" : "") +
                       "cgi-bin/" + _projExt);
-    qDebug() << "Base URL: " << baseURL;
-    qDebug() << "Project URL: " << projURL;
+    logger[1] << "Base URL: " += baseURL;
+    logger[1] << "Project URL: " += projURL;
 
     netHub = new QNetworkAccessManager(this);
+    logger = Logger(editor);
 }
 
 JSExecEngine::~JSExecEngine()
@@ -32,7 +33,7 @@ void JSExecEngine::exists_user(QString userID)
     buildRequest(instr);
     QNetworkReply *reply = netHub->get(*instr->request);
     connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
-    qDebug() << "Started existance check " << instr->request->url();
+    logger[1] << QString("Started existance check ") + instr->request->url().toString();
 }
 
 void JSExecEngine::register_user(QString firstName, QString lastName)
@@ -47,7 +48,7 @@ void JSExecEngine::register_user(QString firstName, QString lastName)
     buildRequest(instr);
     QNetworkReply *reply = netHub->get(*instr->request);
     connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
-    qDebug() << "Started user registration: " << instr->request->url();
+    logger[1] << QString("Started user registration ") + instr->request->url().toString();
 
 }
 
@@ -59,7 +60,7 @@ void JSExecEngine::get_projects()
     buildRequest(instr);
     QNetworkReply *reply = netHub->get(*instr->request);
     connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
-    qDebug() << "Started existance check " << instr->request->url();
+    logger[1] << QString("Started get projects request ") + instr->request->url().toString();
 }
 
 bool JSExecEngine::standardEnd(QString *check)
@@ -115,7 +116,7 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
 { //TODO: James -> Error signal?
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray data = reply->readAll();
-        qDebug() << "returned: " << QString::fromUtf8(data);
+        logger[1] << "returned: " += QString::fromUtf8(data);
         if (instr == nullptr) return;
         switch(instr->returnSignal) {
         case existsUser : {
@@ -131,9 +132,8 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
             else {
                 QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(data).toUtf8());
                 QJsonObject obj;
-                if (doc.isNull() || !doc.isObject()) {emit register_user_result(""); qDebug() << "doc is null or not an object"; return;}
+                if (doc.isNull() || !doc.isObject()) {emit register_user_result(""); logger[1] << "doc is null or not an object"; return;}
                 obj = doc.object();
-                qDebug() << "userID: " << obj["userID"];
                 emit register_user_result(QString::number(obj["userID"].toDouble()));
             }
             break;
@@ -142,7 +142,7 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
             QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(data).toUtf8());
             QJsonObject projectObj;
             QJsonArray projects;
-            if (doc.isNull() || !doc.isObject()) {emit get_projects_result(QLinkedList<Project>()); qDebug() << "doc is null or not an object"; return;}
+            if (doc.isNull() || !doc.isObject()) {emit get_projects_result(QLinkedList<Project>()); logger[1] << "doc is null or not an object"; return;}
             projectObj = doc.object();
             projects = projectObj["projects"].toArray();
             QLinkedList<Project> retList;

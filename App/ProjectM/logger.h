@@ -10,6 +10,8 @@ public:
 
     Logger operator<<(QString string);
     Logger operator<<(const char *string);
+    Logger operator+=(QString string);
+    Logger operator+=(const char *string);
     Logger operator[](int ind);
 
 private:

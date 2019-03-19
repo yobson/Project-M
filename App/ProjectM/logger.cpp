@@ -19,7 +19,7 @@ Logger Logger::operator<<(QString string)
     tmp = tmp + string;
     qDebug() << tmp;
     tmp += '\n';
-    target->document()->setPlainText(tmp);
+    if (target != nullptr) target->document()->setPlainText(tmp);
     Logger ret(target, indent);
     return *this;
 }
@@ -30,6 +30,18 @@ Logger Logger::operator<<(const char *string)
     return operator<<(str);
 }
 
+Logger Logger::operator+=(QString string)
+{
+    printIndent(1);
+    return operator<<(string);
+}
+
+Logger Logger::operator+=(const char *string)
+{
+    QString str = QString::fromLatin1(string);
+    return operator+=(str);
+}
+
 Logger Logger::operator[](int ind)
 {
     return Logger(target, ind);
@@ -37,6 +49,7 @@ Logger Logger::operator[](int ind)
 
 void Logger::printIndent(int i)
 {
+    if (target == nullptr) return;
     QString tmp = target->toPlainText();
     for(int j = 0; j < i; j++) tmp += "    ";
     target->document()->setPlainText(tmp);

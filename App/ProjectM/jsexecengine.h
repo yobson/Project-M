@@ -7,6 +7,8 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QLinkedList>
+#include "logger.h"
+#include <QPlainTextEdit>
 
 //This class is in charge of all comunication between the server and the app
 //Server Queries will be in snake case starting with the type of query:
@@ -17,7 +19,7 @@ class JSExecEngine : public QObject
     Q_OBJECT
 
 public:
-    JSExecEngine(QString _baseURL, QString _projExt, QObject *parent = nullptr);
+    JSExecEngine(QString _baseURL, QString _projExt, QObject *parent = nullptr, QPlainTextEdit *editor = nullptr);
     ~JSExecEngine();
     void exists_user(QString userID);
     void register_user(QString firstName, QString lastName);
@@ -59,6 +61,7 @@ private:
     void buildRequest(nethub_poll *inst);
     void parseReturn(QNetworkReply *reply, nethub_poll *instr);
     void deleteNethubPoll(nethub_poll *poll);
+    Logger logger;
 };
 
 #endif // JSEXECENGINE_H
