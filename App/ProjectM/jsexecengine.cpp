@@ -5,6 +5,7 @@
 #include <QNetworkReply>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 
 JSExecEngine::JSExecEngine(QString _baseURL, QString _projExt, QObject *parent) : QObject(parent)
 {
@@ -111,7 +112,7 @@ void JSExecEngine::buildRequest(JSExecEngine::nethub_poll *inst)
 }
 
 void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
-{ //Needs a test
+{ //TODO: James -> Error signal?
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray data = reply->readAll();
         qDebug() << "returned: " << QString::fromUtf8(data);
@@ -137,7 +138,25 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
             }
             break;
         };
-        case retProjs : {break;} //TODO: James -> Work out how this is even going to work!?
+        case retProjs : {
+            QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(data).toUtf8());
+            QJsonObject projectObj;
+            QJsonArray projects;
+            if (doc.isNull() || !doc.isObject()) {emit get_projects_result(QLinkedList<Project>()); qDebug() << "doc is null or not an object"; return;}
+            projectObj = doc.object();
+            projects = projectObj["projects"].toArray();
+            QLinkedList<Project> retList;
+            Q_FOREACH(const QJsonValue &val, projects) {
+                QJsonObject project = val.toObject();
+                Project p;
+                p.name        = project["name"].toString();
+                p.description = project["desc"].toString();
+                p.URL         = project["url" ].toString();
+                retList << p;
+            }
+            emit get_projects_result(retList);
+            break;
+        };
         case noSignal   : return;
         }
     }

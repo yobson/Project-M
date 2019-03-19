@@ -6,6 +6,7 @@
 #include <QString>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QLinkedList>
 
 //This class is in charge of all comunication between the server and the app
 //Server Queries will be in snake case starting with the type of query:
@@ -21,10 +22,16 @@ public:
     void exists_user(QString userID);
     void register_user(QString firstName, QString lastName);
     void get_projects();
+    typedef struct {
+        QString name;
+        QString description;
+        QString URL;
+    } Project;
 
 signals:
     void exists_user_result(bool);
     void register_user_result(QString);
+    void get_projects_result(QLinkedList<Project>);
 
 private:
     enum query_type {getUser, regUser, noQuery, getProjs};
