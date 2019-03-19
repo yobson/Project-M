@@ -30,7 +30,8 @@ SOURCES += \
     registration.cpp \
     jsexecengine.cpp \
     loginwindow.cpp \
-    testpage.cpp
+    testpage.cpp \
+    logger.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -38,7 +39,8 @@ HEADERS += \
     jsexecengine.h \
     loginwindow.h \
     magic.h \
-    testpage.h
+    testpage.h \
+    logger.h
 
 FORMS += \
         mainwindow.ui \

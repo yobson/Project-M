@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QPlainTextEdit>
+#include "jsexecengine.h"
+#include "logger.h"
 
 namespace Ui {
 class TestPage;
@@ -13,21 +15,6 @@ class TestPage;
 // Hello
 // World
 // If you want an indent, logger[n] will indent n times for everything on that line!
-
-class Logger {
-public:
-    Logger(QPlainTextEdit *edit = nullptr);
-
-    Logger operator<<(QString string);
-    Logger operator<<(const char *string);
-    Logger operator[](int ind);
-
-private:
-    Logger(const QPlainTextEdit *edit, int ind);
-    const QPlainTextEdit *target;
-    void printIndent(int i);
-    int indent = 0;
-};
 
 class TestPage : public QMainWindow
 {
@@ -40,9 +27,12 @@ public:
 private slots:
     void on_get_projects_btn_clicked();
 
+    void on_run_prime_btn_clicked();
+
 private:
     Ui::TestPage *ui;
     Logger logger;
+    JSExecEngine *engine = nullptr;
 };
 
 #endif // TESTPAGE_H

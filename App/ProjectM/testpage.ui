@@ -39,7 +39,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="run_prime_btn">
         <property name="text">
          <string>Run Prime</string>
         </property>
