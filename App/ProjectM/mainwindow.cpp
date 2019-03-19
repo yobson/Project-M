@@ -10,10 +10,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    if (tp != nullptr) delete tp;
     delete ui;
 }
 
 void MainWindow::on_james_test_btn_clicked()
 {
-   //TODO: James -> Link to test page
+    tp = new TestPage(this);
+    tp->show();
 }

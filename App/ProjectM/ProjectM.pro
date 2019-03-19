@@ -29,19 +29,22 @@ SOURCES += \
         mainwindow.cpp \
     registration.cpp \
     jsexecengine.cpp \
-    loginwindow.cpp
+    loginwindow.cpp \
+    testpage.cpp
 
 HEADERS += \
         mainwindow.h \
     registration.h \
     jsexecengine.h \
     loginwindow.h \
-    magic.h
+    magic.h \
+    testpage.h
 
 FORMS += \
         mainwindow.ui \
     registration.ui \
-    loginwindow.ui
+    loginwindow.ui \
+    testpage.ui
 
 CONFIG += mobility
 MOBILITY = 

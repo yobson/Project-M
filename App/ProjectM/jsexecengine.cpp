@@ -50,6 +50,17 @@ void JSExecEngine::register_user(QString firstName, QString lastName)
 
 }
 
+void JSExecEngine::get_projects()
+{
+    nethub_poll *instr = new nethub_poll();
+    instr->queryType = getProjs;
+    instr->returnSignal = retProjs;
+    buildRequest(instr);
+    QNetworkReply *reply = netHub->get(*instr->request);
+    connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
+    qDebug() << "Started existance check " << instr->request->url();
+}
+
 bool JSExecEngine::standardEnd(QString *check)
 {
     int len = check->length();
@@ -81,6 +92,15 @@ void JSExecEngine::buildRequest(JSExecEngine::nethub_poll *inst)
             query.addQueryItem("action","RegUser");
             query.addQueryItem("firstName", inst->data.names->firstName);
             query.addQueryItem("secondName", inst->data.names->lastName);
+            url.setQuery(query);
+            inst->request = new QNetworkRequest(url);
+            break;
+        }
+        case getProjs : {
+            QUrl url(baseURL);
+            QUrlQuery query;
+            query.addQueryItem("action","GetTasks");
+            query.addQueryItem("id", *inst->userID);
             url.setQuery(query);
             inst->request = new QNetworkRequest(url);
             break;
@@ -117,6 +137,7 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
             }
             break;
         };
+        case retProjs : {break;} //TODO: James -> Work out how this is even going to work!?
         case noSignal   : return;
         }
     }

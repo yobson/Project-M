@@ -20,14 +20,15 @@ public:
     ~JSExecEngine();
     void exists_user(QString userID);
     void register_user(QString firstName, QString lastName);
+    void get_projects();
 
 signals:
     void exists_user_result(bool);
     void register_user_result(QString);
 
 private:
-    enum query_type {getUser, regUser, noQuery};
-    enum return_signal {existsUser, userReg, noSignal};
+    enum query_type {getUser, regUser, noQuery, getProjs};
+    enum return_signal {existsUser, userReg, noSignal, retProjs};
     typedef struct {
         QString firstName;
         QString lastName;
