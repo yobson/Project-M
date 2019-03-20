@@ -1,10 +1,11 @@
 #include "logger.h"
 #include <QDebug>
+#include <QScrollBar>
 
-Logger::Logger(QPlainTextEdit *edit) : target(edit)
+Logger::Logger(QPlainTextEdit *edit, QString name) : target(edit)
 {
     if (target == nullptr) return;
-    *this << "Logger initialised";
+    if (name != "") *this << QString(name + " attached to logger");
 }
 
 Logger::Logger(const QPlainTextEdit *edit, int ind) : target(edit)
@@ -15,11 +16,14 @@ Logger::Logger(const QPlainTextEdit *edit, int ind) : target(edit)
 Logger Logger::operator<<(QString string)
 {
     printIndent(indent);
+    qDebug() << string;
     QString tmp = target != nullptr ? target->toPlainText() : "";
-    tmp = tmp + string;
-    qDebug() << tmp;
-    tmp += '\n';
-    if (target != nullptr) target->document()->setPlainText(tmp);
+    tmp = tmp + string + '\n';
+    if (target != nullptr)
+    {
+        target->document()->setPlainText(tmp);
+        target->verticalScrollBar()->setValue(target->verticalScrollBar()->maximum());
+    }
     Logger ret(target, indent);
     return *this;
 }

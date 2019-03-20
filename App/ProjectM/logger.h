@@ -6,7 +6,7 @@
 class Logger
 {
 public:
-    Logger(QPlainTextEdit *edit = nullptr);
+    Logger(QPlainTextEdit *edit = nullptr, QString name = "");
 
     Logger operator<<(QString string);
     Logger operator<<(const char *string);

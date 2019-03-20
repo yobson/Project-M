@@ -5,6 +5,7 @@
 #include <QPlainTextEdit>
 #include "jsexecengine.h"
 #include "logger.h"
+#include <QLinkedList>
 
 namespace Ui {
 class TestPage;
@@ -26,8 +27,9 @@ public:
 
 private slots:
     void on_get_projects_btn_clicked();
-
     void on_run_prime_btn_clicked();
+    void gotProjects(QLinkedList<JSExecEngine::Project> p);
+
 
 private:
     Ui::TestPage *ui;
