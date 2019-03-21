@@ -15,7 +15,7 @@ Registration::Registration(QWidget *parent) :
     ui->setupUi(this);
     engine = new JSExecEngine(PROJECT_BASE_IP, "", this);
     auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    fileName= path + "/userID.txt"; //TODO: James -> Add to magic strigs
+    fileName= path + USER_ID_FILE;
 }
 
 Registration::~Registration()

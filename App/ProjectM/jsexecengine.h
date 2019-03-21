@@ -35,6 +35,7 @@ signals:
     void exists_user_result(bool);
     void register_user_result(QString);
     void get_projects_result(QLinkedList<Project>);
+    void web_error(QNetworkReply::NetworkError);
 
 private:
     enum query_type {getUser, regUser, noQuery, getProjs, getJS, getJSInput, returnJS};

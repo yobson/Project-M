@@ -45,7 +45,7 @@ void LoginWindow::checkLogin()
 {
     qDebug() << "Check login";
     auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    auto fileName= path + "/userID.txt"; //TODO: James -> Add to magic strings
+    auto fileName= path + USER_ID_FILE;
     QDir dir(path);
     if(!dir.exists()) dir.mkpath(".");
     QFileInfo checkFile(fileName);

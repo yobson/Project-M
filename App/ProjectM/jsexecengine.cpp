@@ -10,6 +10,7 @@
 #include <QFileInfo>
 #include <QFile>
 #include <QTextStream>
+#include "magic.h"
 
 JSExecEngine::JSExecEngine(QString _baseURL, QString _projExt, QObject *parent, QPlainTextEdit *editor) : QObject(parent)
 {
@@ -163,7 +164,7 @@ void JSExecEngine::buildRequest(JSExecEngine::nethub_poll *inst)
 }
 
 void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
-{ //TODO: James -> Error signal?
+{
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray data = reply->readAll();
         logger << "returned: " += QString::fromUtf8(data);
@@ -231,12 +232,15 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
         case noSignal   : deleteNethubPoll(instr); return;
         }
     }
+    else {
+        emit web_error(reply->error());
+    }
 
     reply->deleteLater();
 }
 
 void JSExecEngine::deleteNethubPoll(JSExecEngine::nethub_poll *poll)
-{//TODO: James -> Remove union members
+{
     if (poll == nullptr) return;
     if (poll->request != nullptr) delete poll->request;
     if (poll->userID != nullptr) delete poll->userID;
@@ -247,7 +251,7 @@ void JSExecEngine::deleteNethubPoll(JSExecEngine::nethub_poll *poll)
 QString JSExecEngine::getUserID()
 {
     auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    auto fileName= path + "/userID.txt"; //TODO: James -> Add to magic strings
+    auto fileName= path + USER_ID_FILE;
     QFileInfo checkFile(fileName);
     if (checkFile.exists() && checkFile.isFile()) {
         QFile file(fileName);
