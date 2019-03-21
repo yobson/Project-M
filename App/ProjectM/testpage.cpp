@@ -10,6 +10,7 @@ TestPage::TestPage(QWidget *parent) :
     ui->setupUi(this);
     logger = Logger(ui->logPage, "Test page");
     engine = new JSExecEngine(PROJECT_BASE_IP, "Primes.cgi", this, ui->logPage);
+    connect(engine, &JSExecEngine::get_projects_result, this, &TestPage::gotProjects);
 }
 
 TestPage::~TestPage()
@@ -22,12 +23,12 @@ void TestPage::on_get_projects_btn_clicked()
 {
     logger << "Getting Projects";
     engine->get_projects();
-    connect(engine, &JSExecEngine::get_projects_result, this, &TestPage::gotProjects);
 }
 
 void TestPage::on_run_prime_btn_clicked()
 {
-    logger << "Not implemented yet!";
+    logger << "Starting primes";
+    engine->run_project();
 }
 
 void TestPage::gotProjects(QLinkedList<JSExecEngine::Project> p)
