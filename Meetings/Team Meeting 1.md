@@ -42,7 +42,7 @@
 ### After that:
 
 - [ ] JS library with phone censors
-- [ ] Track 'wealth'
+- [x] Track 'wealth'
 - [x] Get\register ID
 - [ ] Better scheduler (when screen off etc)
 
