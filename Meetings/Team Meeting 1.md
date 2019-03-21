@@ -35,20 +35,20 @@
 
 ### Core tasks:
 
-1. Get tasks list
-2. Run task
-3. Schedule the nieve way
+- [x] Get tasks list
+- [x] Run task
+- [ ] Schedule the nieve way
 
 ### After that:
 
-1. JS library with phone censors
-2. Track 'wealth'
-3. Get\register ID
-4. Better scheduler (when screen off etc)
+- [ ] JS library with phone censors
+- [ ] Track 'wealth'
+- [x] Get\register ID
+- [ ] Better scheduler (when screen off etc)
 
 ### After $ after that:
 
-1. API for getting 'wealth'
-2. More security!!!
-3. Make it look pretty
+- [ ] API for getting 'wealth'
+- [ ] More security!!!
+- [ ] Make it look pretty
 
