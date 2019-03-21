@@ -77,6 +77,7 @@ void JSExecEngine::run_project()
     nethub_poll *instr = new nethub_poll();
     instr->queryType = getJS;
     instr->returnSignal = jsReady;
+    instr->userID = new QString(getUserID());
     buildRequest(instr);
     QNetworkReply *reply = netHub->get(*instr->request);
     connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
@@ -105,6 +106,7 @@ void JSExecEngine::buildRequest(JSExecEngine::nethub_poll *inst)
             query.addQueryItem("action","GetUser");
             query.addQueryItem("id", *inst->userID);
             url.setQuery(query);
+            if (inst->request != nullptr) delete inst->request;
             inst->request = new QNetworkRequest(url);
             break;
         }
@@ -115,6 +117,7 @@ void JSExecEngine::buildRequest(JSExecEngine::nethub_poll *inst)
             query.addQueryItem("firstName", inst->data.names->firstName);
             query.addQueryItem("secondName", inst->data.names->lastName);
             url.setQuery(query);
+            if (inst->request != nullptr) delete inst->request;
             inst->request = new QNetworkRequest(url);
             break;
         }
@@ -123,6 +126,7 @@ void JSExecEngine::buildRequest(JSExecEngine::nethub_poll *inst)
             QUrlQuery query;
             query.addQueryItem("action","GetTasks");
             url.setQuery(query);
+            if (inst->request != nullptr) delete inst->request;
             inst->request = new QNetworkRequest(url);
             break;
         }
@@ -131,6 +135,7 @@ void JSExecEngine::buildRequest(JSExecEngine::nethub_poll *inst)
             QUrlQuery query;
             query.addQueryItem("event","RequestJS");
             url.setQuery(query);
+            if (inst->request != nullptr) delete inst->request;
             inst->request = new QNetworkRequest(url);
             break;
         }
@@ -139,6 +144,7 @@ void JSExecEngine::buildRequest(JSExecEngine::nethub_poll *inst)
             QUrlQuery query;
             query.addQueryItem("event","RequestInput");
             url.setQuery(query);
+            if (inst->request != nullptr) delete inst->request;
             inst->request = new QNetworkRequest(url);
             break;
         }
@@ -147,6 +153,7 @@ void JSExecEngine::buildRequest(JSExecEngine::nethub_poll *inst)
             QUrlQuery query;
             query.addQueryItem("event",QString("ReturnAns ") + inst->data.result);
             url.setQuery(query);
+            if (inst->request != nullptr) delete inst->request;
             inst->request = new QNetworkRequest(url);
             break;
         }
@@ -204,25 +211,24 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
             break;
         }
         case jsReady : {
-            QString unfilteredJS = QString::fromUtf8(data);
-            QString filteredJS = unfilteredJS.mid(6, unfilteredJS.length()-7);
-            logger << "Got JS" += filteredJS;
-            get_project_input(filteredJS, instr);
+            QString JS = QString::fromUtf8(data);
+            logger << "Got JS" += JS;
+            get_project_input(JS, instr);
             break;
         }
         case jsInputReady : {
-            QString unfilteredIn = QString::fromUtf8(data);
-            QString filteredIn = unfilteredIn.mid(6, unfilteredIn.length()-7);
-            logger << "Got JS" += filteredIn;
+            QString in = QString::fromUtf8(data);
+            logger << "Got JS" += in;
             QJSEngine engine;
             QJSValue fun = engine.evaluate(*instr->data.js);
             QJSValueList args;
-            args << *instr->userID << filteredIn;
+            args << *instr->userID << in;
             QJSValue ret = fun.call(args);
+            logger << "Calculated answer:" += ret.toString();
             return_answer(ret.toString(), instr);
             break;
         }
-        case noSignal   : return;
+        case noSignal   : deleteNethubPoll(instr); return;
         }
     }
 
@@ -234,6 +240,7 @@ void JSExecEngine::deleteNethubPoll(JSExecEngine::nethub_poll *poll)
     if (poll == nullptr) return;
     if (poll->request != nullptr) delete poll->request;
     if (poll->userID != nullptr) delete poll->userID;
+    if (poll->data.js != nullptr) delete poll->data.js;
     delete poll;
 }
 
@@ -273,5 +280,5 @@ void JSExecEngine::return_answer(QString result, JSExecEngine::nethub_poll *inst
     buildRequest(instr);
     QNetworkReply *reply = netHub->get(*instr->request);
     connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
-    logger << QString("Returning Answer") + instr->request->url().toString();
+    logger << QString("Returning Answer ") + instr->request->url().toString();
 }

@@ -22,7 +22,11 @@ m |>>=| f = fmap (>>= f) m
 infixl 1 |>>=|
 
 data Event a = RequestJS | RequestInput | ReturnAns Int a | ShowProject deriving (Read, Show)
-data Result = Send String | Yeet deriving (Show)
+data Result = Send String | Yeet
+
+instance Show Result where
+  show (Send a) = a
+  show Yeet     = "Yeet"
 
 type Input = (String, String)
 type Updater a b = a -> Event b -> (a, Result)

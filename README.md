@@ -41,7 +41,7 @@ import ProjectM
 
 type State = (Int, Int, Int) -- Largest, Last Checked, ID of largest
 
-jsMin = "testJS" -- JS goes here
+jsMin = "(function(id, number){var n = parseInt(number); for (var i = 2; i <= Math.sqrt(n); i++) {if (n % i == 0){return id + \" \" + 0}} return id + \" \" + n;})" -- JS goes here
 
 updater :: Updater State Int
 updater state             RequestJS      = (state, Send jsMin)
@@ -71,7 +71,7 @@ type State = (Int, Int, Int) -- Largest, Last Checked, ID of largest
 This is the user defined state type. It can be as complicated as you like, but it has to be readable and showable (explanation later). I have chosen for this prime number solver, that the state should be a product type with the largest prime number, the last number checked and the ID of the user that found it.
 
 ```haskell
-jsMin = "testJS" -- JS goes here
+jsMin = "(function(id, number){var n = parseInt(number); for (var i = 2; i <= Math.sqrt(n); i++) {if (n % i == 0){return id + \" \" + 0}} return id + \" \" + n;})" -- JS goes here
 ```
 
 This line sets a string with the JS code. The JS must be a single, anonymous function with a single input. It must return a specifically formatted string, `(UserID, result)`
