@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui qml network
+QT       += core gui qml network androidextras
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -31,7 +31,8 @@ SOURCES += \
     jsexecengine.cpp \
     loginwindow.cpp \
     testpage.cpp \
-    logger.cpp
+    logger.cpp \
+    service.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -40,7 +41,8 @@ HEADERS += \
     loginwindow.h \
     magic.h \
     testpage.h \
-    logger.h
+    logger.h \
+    service.h
 
 FORMS += \
         mainwindow.ui \
