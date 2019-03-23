@@ -32,7 +32,9 @@ SOURCES += \
     loginwindow.cpp \
     testpage.cpp \
     logger.cpp \
-    service.cpp
+    service.cpp \
+    projectwindow.cpp \
+    project.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -42,13 +44,16 @@ HEADERS += \
     magic.h \
     testpage.h \
     logger.h \
-    service.h
+    service.h \
+    projectwindow.h \
+    project.h
 
 FORMS += \
         mainwindow.ui \
     registration.ui \
     loginwindow.ui \
-    testpage.ui
+    testpage.ui \
+    projectwindow.ui
 
 CONFIG += mobility
 MOBILITY = 

@@ -16,6 +16,9 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
+     <widget class="QListView" name="project_list_view"/>
+    </item>
+    <item>
      <widget class="QLabel" name="label">
       <property name="text">
        <string>Main Window</string>
