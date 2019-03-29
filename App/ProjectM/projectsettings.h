@@ -7,24 +7,24 @@
 class ProjectSettings
 {
 public:
-    // The value is: QJsonArray
+    // The corresponding value is: QJsonArray with the projects
     static const QString PROJECTS;
-    // The value is: unique string to identify the project
+    // The corresponding value is: unique string to identify the project
     static const QString NAME;
-    // The value is: int that corresponds to the frequency in seconds
+    // The corresponding value is: int that corresponds to the frequency in seconds
     static const QString FREQUENCY;
 
-    // Th value is: bool
+    // The corresponding value is: bool
     static const QString WIFI_ONLY;
-    // The value is: bool
+    // The corresponding value is: bool
     static const QString CHARGING_ONLY;
-    // The value is: int (between 0 and 100)
+    // The corresponding value is: int (between 0 and 100)
     static const QString MIN_BATTERY_LEVEL;
-    // The value is: QJsonObject(start, end)
+    // The corresponding value is: QJsonObject({start, end})
     static const QString TIME_FRAME;
-    // The value is: hh:mm:ss
+    // The corresponding value is: hh:mm:ss
     static const QString TIME_FRAME_START;
-    // The value is: hh:mm:ss
+    // The corresponding value is: hh:mm:ss
     static const QString TIME_FRAME_END;
 
     // Check every CHECKING_FREQ milliseconds for projects to run.
