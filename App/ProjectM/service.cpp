@@ -49,6 +49,7 @@ QJsonDocument loadJson(QString fileName) {
     }
 }
 
+/** Save a JsonDocument to a specific file. */
 void saveJson(QJsonDocument jsonDocument, QString fileName) {
     auto path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     fileName = path + fileName;
@@ -60,8 +61,8 @@ void saveJson(QJsonDocument jsonDocument, QString fileName) {
     jsonFile.close();
 }
 
-QJsonArray loadProjects()
-{
+/** Return a JsonArray containing the active projects. */
+QJsonArray loadProjects() {
     QJsonDocument jsonDoument = loadJson(ACTIVE_PROJECTS_FILE);
     QJsonObject jsonObject = jsonDoument.object();
     if (jsonObject.contains(ProjectSettings::PROJECTS)) {
@@ -71,6 +72,7 @@ QJsonArray loadProjects()
     }
 }
 
+/** Return a JsonObject containing the time when each project was last run. */
 QJsonObject loadTimes() {
     QJsonDocument jsonDocument = loadJson(LAST_RUN_FILE);
     return jsonDocument.object();
@@ -80,6 +82,7 @@ void saveNewTimes(QJsonObject &jsonObject) {
     saveJson(QJsonDocument(jsonObject), LAST_RUN_FILE);
 }
 
+/** Check if the project should be run now. */
 bool shouldRun(QJsonObject &project, QJsonObject &lastRun) {
     QString projectName = project[ProjectSettings::NAME].toString();
 
@@ -131,8 +134,7 @@ bool shouldRun(QJsonObject &project, QJsonObject &lastRun) {
     return true;
 }
 
-void Service::triggered()
-{
+void Service::triggered() {
     qDebug() << "SERVICE :: TRIGGERED";
     QJsonArray projects = loadProjects();
     QJsonObject times = loadTimes();
