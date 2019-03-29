@@ -1,9 +1,9 @@
 package space.hobson.ProjectM;
 
-import android.content.Context;
-import android.content.Intent;
 import org.qtproject.qt5.android.bindings.QtService;
 import android.util.Log;
+import android.content.Context;
+import android.content.Intent;
 
 public class MService extends QtService
 {
