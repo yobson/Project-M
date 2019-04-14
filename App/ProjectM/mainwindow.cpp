@@ -51,9 +51,4 @@ void MainWindow::on_project_list_view_clicked(const QModelIndex &index)
 {
     projectWindow = new ProjectWindow(&(*project_list)[index.row()], this);
     projectWindow->show();
-    //got rid of line below so pressing back on a project page takes
-    //user back to list of projects
-    //But pressing back does not run the projectwindow destructor so
-    //settings arent saved!! ugh
-    //this->hide();
 }
