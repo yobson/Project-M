@@ -51,5 +51,4 @@ void MainWindow::on_project_list_view_clicked(const QModelIndex &index)
 {
     projectWindow = new ProjectWindow(&(*project_list)[index.row()], this);
     projectWindow->show();
-    this->hide();
 }
