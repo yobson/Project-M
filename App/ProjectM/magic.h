@@ -3,7 +3,7 @@
 #define MAGIC_H
 
 
-#define PROJECT_BASE_IP "192.168.0.53:3000"
+#define PROJECT_BASE_IP "www.hobson.space"
 #define USER_ID_FILE "/userID.txt"
 
 #endif // MAGIC_H
