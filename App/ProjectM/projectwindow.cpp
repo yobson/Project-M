@@ -4,7 +4,6 @@
 #include <QSettings>
 #include <QString>
 
-
 ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ProjectWindow)
@@ -56,21 +55,6 @@ ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
 ProjectWindow::~ProjectWindow()
 {
     /// TODO: update project settings;
-    /// What, if anything, causes this to be run?!
-
-/*
-    QSettings settings;
-
-    //kinda redundant calculating the key value each time, where can i define it just once and reuse?
-    QString q_enabled_setting_key = QString::fromUtf8((project->name() + "_enabled_setting").c_str());
-    settings.setValue(q_enabled_setting_key,project->enabled());
-
-    QString q_wifi_setting_key = QString::fromUtf8((project->name() + "_wifi_setting").c_str());
-    settings.setValue(q_wifi_setting_key,project->wifi_only());
-
-    QString q_pluggedin_setting_key = QString::fromUtf8((project->name() + "_pluggedin_setting").c_str());
-    settings.setValue(q_pluggedin_setting_key,project->plugged_in_only());
-*/
     delete ui;
 }
 
@@ -91,7 +75,6 @@ void ProjectWindow::on_enabled_check_box_stateChanged(int arg1)
 void ProjectWindow::on_wifi_check_box_stateChanged(int arg1)
 {
     this->project->wifi_only() = arg1;
-
     QSettings settings;
     QString q_wifi_setting_key = QString::fromUtf8((project->name() + "_wifi_setting").c_str());
     settings.setValue(q_wifi_setting_key,project->wifi_only());

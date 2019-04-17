@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     /// TODO: Get real data
     // Make mock data
     project_list = new QList<Project>();
-    project_list->append(Project("PrimesAAAA", "Calculate Primes"));
+    project_list->append(Project("Primes", "Calculate Primes"));
     project_list->append(Project("Pollution", "Crowdsourced pollution measurement"));
     project_list->append(Project("Project X", "???"));
 
