@@ -1,0 +1,26 @@
+PREFIX=@prefix@
+TARGETS=@targets@
+DEPLOY=@deploy_tool@
+JDK=@jdk@
+
+all: $(TARGETS)
+
+build/libProjectM.so:
+	$(MAKE) -C build install INSTALL_ROOT=$(PWD)/build
+
+%.apk: build/lib%.so
+	$(DEPLOY) --input build/android-libProjectM.so-deployment-settings.json --output build \
+		--gradle --jdk $(JDK) \
+		--verbose --android-platform android-28 && cp build/build/outputs/apk/debug/build-debug.apk \
+		$@
+
+app_make:
+	cd build && $(MAKE) install INSTALL_ROOT=$(PWD)
+
+%.cgi: Server/%.hs
+	cd Server && ghc $(^:Server/%=%) -O2 -o ../$@
+
+clean:
+	mkdir -p /tmp/projectMInstaller && mv build/*.json /tmp/projectMInstaller/. \
+   && mv build/Makefile /tmp/projectMInstaller/. && rm -fr build && mv /tmp/projectMInstaller build && \
+	 rm *.apk && rm *.cgi
