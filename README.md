@@ -7,6 +7,7 @@ You will need to run it to get the configure script:
 autoconf
 ```
 Now we need to configure the app. Here are the important config options:
+
 | Option | Use |
 | ------ | --- |
 | `--disable-app` | Don't build app |
@@ -19,6 +20,7 @@ Now we need to configure the app. Here are the important config options:
 | `ANDROID_NDK_ROOT=<path>` | Specify path to android NDK |
 | `ANDROID_SDK_ROOT=<path>` | Specify path to android SDK |
 | `JAVA_HOME=<path>` | Specify path to jdk |
+
 To see an example set of argument, the arguments I pass are:
 ```bash
 ./configure --with-qt-path=$HOME/Qt --with-arch=x86 ANDROID_NDK_ROOT=/Users/jameshobson/Downloads/android-ndk-r19b/ ANDROID_SDK_ROOT=/Users/jameshobson/Library/Android/sdk/ JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/ --enable-autodep --with-live-address=www.hobson.space
