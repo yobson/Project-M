@@ -2,6 +2,7 @@ PREFIX=@prefix@
 TARGETS=@targets@
 DEPLOY=@deploy_tool@
 JDK=@jdk@
+PROJECTS_PATH=@projects_list@
 
 all: $(TARGETS)
 
@@ -18,7 +19,7 @@ app_make:
 	cd build && $(MAKE) install INSTALL_ROOT=$(PWD)
 
 %.cgi: Server/%.hs
-	cd Server && ghc $(^:Server/%=%) -O2 -o ../$@
+	cd Server && ghc $(^:Server/%=%) -O2 -o ../$@ -DPROJECTS_PATH='"$(PROJECTS_PATH)"'
 
 clean:
 	mkdir -p /tmp/projectMInstaller && mv build/*.json /tmp/projectMInstaller/. \

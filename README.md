@@ -17,6 +17,7 @@ Now we need to configure the app. Here are the important config options:
 | `--with-arch=<arch>` | Set android build architecture. Options are: arm64\_v8a, armv7, x86 |
 | `--with-qt-version=<version>` | Set Qt version. If not set, will choose newest version installed |
 | `--with-live-address=<web address>` | Sets server address for app. f unset, will default to the test server address |
+| `--with-projects-list` | Sets path to list file (for server). Deafults to `/tmp/projectList.txt`
 | `ANDROID_NDK_ROOT=<path>` | Specify path to android NDK |
 | `ANDROID_SDK_ROOT=<path>` | Specify path to android SDK |
 | `JAVA_HOME=<path>` | Specify path to jdk |

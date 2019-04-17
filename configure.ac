@@ -30,6 +30,12 @@ AC_ARG_WITH([live-address],
               server_addr="$withval",
               server_addr="localhost:3000")
 
+AC_ARG_WITH([projects-list],
+            AS_HELP_STRING([--with-projects-list], [set path to projects list file. Defaults to /tmp/projectList.txt]),
+              projects_list="$withval",
+              projects_list="/tmp/projectList.txt")
+AC_SUBST([projects_list])
+
 AC_ARG_ENABLE([autodep],
               AS_HELP_STRING([--enable-autodep],[Auto-install haskell dependencies (needs cabal)]),
               auto_dep="yes",
