@@ -16,7 +16,6 @@ ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
                        | Qt::WindowMaximized);
     ui->project_name->setText(project->name());
     ui->project_desc->setText(project->full_desc());
-
     //Set checkboxes to the saved setting, or unchecked if this project has never been viewed before
     QSettings settings(COMPANY_NAME, APP_NAME);
     settings.beginGroup(ALL_PROJECTS_DIR);
@@ -31,8 +30,7 @@ ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
     ui->wifi_check_box->setCheckState(wifi_setting ? Qt::Checked : Qt::Unchecked);
 
     assert(settings.contains(ProjectSettings::CHARGING_ONLY));
-    bool pluggedin_setting = settings.value(ProjectSettings::CHARGING_ONLY).toBool();
-    ui->plugged_in_check_box->setCheckState(pluggedin_setting ? Qt::Checked : Qt::Unchecked);
+    bool pluggedin_setting = settings.value(ProjectSettings::CHARGING_ONLY).toBool();    ui->plugged_in_check_box->setCheckState(pluggedin_setting ? Qt::Checked : Qt::Unchecked);
 }
 
 ProjectWindow::~ProjectWindow()
@@ -44,10 +42,10 @@ ProjectWindow::~ProjectWindow()
 void ProjectWindow::on_enabled_check_box_stateChanged(int arg1)
 {
     this->project->enabled() = arg1;
-
     QSettings settings(COMPANY_NAME, APP_NAME);
     settings.beginGroup(ALL_PROJECTS_DIR);
     settings.beginGroup(project->name());
+
 
     settings.setValue(ProjectSettings::ENABLED, project->enabled());
     settings.sync();
@@ -63,8 +61,7 @@ void ProjectWindow::on_wifi_check_box_stateChanged(int arg1)
     settings.beginGroup(project->name());
 
     settings.setValue(ProjectSettings::WIFI_ONLY, project->wifi_only());
-    settings.sync();
-}
+    settings.sync();}
 
 void ProjectWindow::on_plugged_in_check_box_stateChanged(int arg1)
 {
@@ -75,5 +72,4 @@ void ProjectWindow::on_plugged_in_check_box_stateChanged(int arg1)
     settings.beginGroup(project->name());
 
     settings.setValue(ProjectSettings::CHARGING_ONLY, project->plugged_in_only());
-    settings.sync();
-}
+    settings.sync();}
