@@ -14,7 +14,7 @@ void writeSampleProjectsToFile();
 
 Service::Service(QObject *parent) : QObject (parent)
 {
-    writeSampleProjectsToFile();
+    // writeSampleProjectsToFile();
     projectEngines.clear();
 }
 
@@ -91,6 +91,7 @@ void Service::triggered() {
     times.beginGroup(LAST_RUN_DIR);
     for (auto projectName : projectNames) {
         projects.beginGroup(projectName);
+        qDebug() << "Project " << projectName;
         if (shouldRun(projects, times, projectName)) {
             runProject(projectName, projects);
             qDebug() << "Project " << projectName << " run";
@@ -105,8 +106,6 @@ void Service::triggered() {
 void writeSampleProjectsToFile() {
     QSettings projects(COMPANY_NAME, APP_NAME);
     projects.beginGroup(ALL_PROJECTS_DIR);
-
-    projects.clear();
 
     projects.beginGroup("A");
     projects.setValue(ProjectSettings::ENABLED, true);

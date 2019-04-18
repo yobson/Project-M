@@ -3,6 +3,7 @@
 #include <QtAndroid>
 #include <QAndroidJniObject>
 #include "magic.h"
+#include <QSettings>
 
 QLinkedList<JSExecEngine::Project> sampleProjects() {
     QLinkedList<JSExecEngine::Project> ps;
@@ -52,6 +53,17 @@ void MainWindow::on_get_projects(QLinkedList<JSExecEngine::Project> ps)
         project_list->append(Project(p.name, p.description, "", p.URL));
         *project_name_list << p.name;
     }
+
+    // Delete from QSettings the projects that are not returned by the server anymore
+    QSettings settings(COMPANY_NAME, APP_NAME);
+    settings.beginGroup(ALL_PROJECTS_DIR);
+    QStringList projectNames = settings.childGroups();
+    for (auto projectName : projectNames) {
+        if (!project_name_list->contains(projectName)) {
+            settings.remove(projectName);
+        }
+    }
+    settings.sync();
 
     // Populate our model
     project_list_model->setStringList(*project_name_list);
