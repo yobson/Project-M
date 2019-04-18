@@ -20,12 +20,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QAndroidJniObject::callStaticMethod<void>("space/hobson/ProjectM/MService", "startMService", "(Landroid/content/Context;)V",
                                               QtAndroid::androidActivity().object());
 
-    /*
     engine = new JSExecEngine(PROJECT_BASE_IP);
     connect(engine, &JSExecEngine::get_projects_result, this, &MainWindow::on_get_projects);
     engine->get_projects();
-    */
-    on_get_projects(sampleProjects());
+
+    // on_get_projects(sampleProjects());
 }
 
 MainWindow::~MainWindow()

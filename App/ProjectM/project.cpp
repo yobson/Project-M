@@ -6,25 +6,48 @@
 Project::Project(QString name, QString short_desc, QString full_desc, QString URL, int frequency, bool enabled, bool wifi_only, bool plugged_in_only)
 {
     this->name_ = name;
+
     this->short_desc_ = short_desc;
     if (full_desc == "")
         this->full_desc_ = short_desc;
     else
         this->full_desc_ = full_desc;
-    this->url_ = URL;
-    this->frequency_ = frequency;
-    this->enabled_ = enabled;
-    this->wifi_only_ = wifi_only;
-    this->plugged_in_only_ = plugged_in_only;
 
     QSettings settings(COMPANY_NAME, APP_NAME);
     settings.beginGroup(ALL_PROJECTS_DIR);
     settings.beginGroup(name);
+
+    this->url_ = URL;
     settings.setValue(ProjectSettings::PROJECT_EXTENSION, URL);
-    settings.setValue(ProjectSettings::ENABLED, enabled);
-    settings.setValue(ProjectSettings::FREQUENCY, frequency);
-    settings.setValue(ProjectSettings::WIFI_ONLY, wifi_only);
-    settings.setValue(ProjectSettings::CHARGING_ONLY, plugged_in_only);
+
+    if (!settings.contains(ProjectSettings::FREQUENCY)) {
+        this->frequency_ = frequency;
+        settings.setValue(ProjectSettings::FREQUENCY, frequency);
+    } else {
+        this->frequency_ = settings.value(ProjectSettings::FREQUENCY).toInt();
+    }
+
+    if (!settings.contains(ProjectSettings::ENABLED)) {
+        this->enabled_ = enabled;
+        settings.setValue(ProjectSettings::ENABLED, enabled);
+    } else {
+        this->enabled_ = settings.value(ProjectSettings::ENABLED).toBool();
+    }
+
+    if (!settings.contains(ProjectSettings::WIFI_ONLY)) {
+        this->wifi_only_ = wifi_only;
+        settings.setValue(ProjectSettings::WIFI_ONLY, wifi_only);
+    } else {
+        this->wifi_only_ = settings.value(ProjectSettings::WIFI_ONLY).toBool();
+    }
+
+    if (!settings.contains(ProjectSettings::CHARGING_ONLY)) {
+        this->plugged_in_only_ = plugged_in_only;
+        settings.setValue(ProjectSettings::CHARGING_ONLY, plugged_in_only);
+    } else {
+        this->plugged_in_only_ = settings.value(ProjectSettings::CHARGING_ONLY).toBool();
+    }
+
     settings.sync();
 }
 
