@@ -31,6 +31,12 @@ ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
 
     assert(settings.contains(ProjectSettings::CHARGING_ONLY));
     bool pluggedin_setting = settings.value(ProjectSettings::CHARGING_ONLY).toBool();    ui->plugged_in_check_box->setCheckState(pluggedin_setting ? Qt::Checked : Qt::Unchecked);
+
+    // Ensures that if the project is enabled, URL already set
+    QString q_url_setting_key = project->name() + "_url_setting";
+    settings.setValue(q_url_setting_key,project->url());
+
+
 }
 
 ProjectWindow::~ProjectWindow()
