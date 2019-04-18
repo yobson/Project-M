@@ -19,12 +19,9 @@
      <widget class="QListView" name="project_list_view"/>
     </item>
     <item>
-     <widget class="QLabel" name="label">
+     <widget class="QPushButton" name="refresh_btn">
       <property name="text">
-       <string>Main Window</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
+       <string>Refresh</string>
       </property>
      </widget>
     </item>

@@ -6,11 +6,12 @@
 class Project
 {
 public:
-    Project(QString name, QString short_desc, QString full_desc = "", bool enabled = false, bool wifi_only = true, bool plugged_in_only = true);
+    Project(QString name, QString short_desc, QString full_desc = "", QString URL = "", bool enabled = false, bool wifi_only = true, bool plugged_in_only = true);
 
     auto name() -> const QString&;
     auto short_desc() -> const QString&;
     auto full_desc() -> const QString&;
+    auto url() -> const QString&;
 
     auto enabled() -> bool&;
     auto wifi_only() -> bool&;
@@ -20,6 +21,7 @@ private:
     QString name_;
     QString short_desc_;
     QString full_desc_;
+    QString url_;
     bool enabled_;
     bool wifi_only_;
     bool plugged_in_only_;
