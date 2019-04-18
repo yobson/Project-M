@@ -35,7 +35,7 @@ public:
 /*
  * The settings should be stored as:
  * QSettings projects(COMPANY_NAME, APP_NAME);
- * projects.beginGroup(ACTIVE_PROJECTS_DIR);
+ * projects.beginGroup(ALL_PROJECTS_DIR);
  *
  * settings.beginGroup(projectName);
  * settings.addValue(ProjectSettings::xxx, xxx);
