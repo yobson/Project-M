@@ -1,6 +1,36 @@
 # Project M
 
-First of all, the project brief
+## Quick Build
+Make sure you have autoconf and Qt installed.
+You will need to run it to get the configure script:
+```bash
+autoconf
+```
+Now we need to configure the app. Here are the important config options:
+
+| Option | Use |
+| ------ | --- |
+| `--disable-app` | Don't build app |
+| `--disbale-server` | Don't build server |
+| `--enable-autodep` | Automatically install haskell dependencies |
+| `--with-qt-path=<path>` | Path to Qt installation. You will probably want to set this |
+| `--with-arch=<arch>` | Set android build architecture. Options are: arm64\_v8a, armv7, x86 |
+| `--with-qt-version=<version>` | Set Qt version. If not set, will choose newest version installed |
+| `--with-live-address=<web address>` | Sets server address for app. f unset, will default to the test server address |
+| `--with-projects-list` | Sets path to list file (for server). Deafults to `/tmp/projectList.txt`
+| `ANDROID_NDK_ROOT=<path>` | Specify path to android NDK |
+| `ANDROID_SDK_ROOT=<path>` | Specify path to android SDK |
+| `JAVA_HOME=<path>` | Specify path to jdk |
+
+To see an example set of argument, the arguments I pass are:
+```bash
+./configure --with-qt-path=$HOME/Qt --with-arch=x86 ANDROID_NDK_ROOT=/Users/jameshobson/Downloads/android-ndk-r19b/ ANDROID_SDK_ROOT=/Users/jameshobson/Library/Android/sdk/ JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home/ --enable-autodep --with-live-address=www.hobson.space
+```
+now we simply run
+```bash
+make
+```
+This should produce `ProjectM.apk` and `main.cgi`. If you want the primes example, type `make Primes.cgi`
 
 > ### Project M: Put your phone to work
 >

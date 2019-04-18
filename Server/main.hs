@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP #-}
 
 import Network.CGI
 import System.IO
@@ -8,7 +9,12 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 import System.IO.Unsafe
 
+#ifndef PROJECTS_PATH
 magicProjectList = "/tmp/projectList.txt"
+#endif
+#ifdef PROJECTS_PATH
+magicProjectList = PROJECTS_PATH
+#endif
 
 class JSON a where
   jsonify :: a -> String
