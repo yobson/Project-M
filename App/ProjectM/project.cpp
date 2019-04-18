@@ -32,6 +32,7 @@ auto Project::name() -> const QString& { return this->name_; }
 auto Project::short_desc() -> const QString& { return this->short_desc_; }
 auto Project::full_desc() -> const QString& { return this->full_desc_; }
 auto Project::url() -> const QString& { return this->url_; }
+
 auto Project::enabled() -> bool& { return this->enabled_; }
 auto Project::wifi_only() -> bool& { return this->wifi_only_; }
 auto Project::plugged_in_only() -> bool& { return this->plugged_in_only_; }

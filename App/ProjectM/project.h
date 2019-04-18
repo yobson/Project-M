@@ -11,6 +11,7 @@ public:
     auto short_desc() -> const QString&;
     auto full_desc() -> const QString&;
     auto url() -> const QString&;
+
     auto enabled() -> bool&;
     auto wifi_only() -> bool&;
     auto plugged_in_only() -> bool&;
