@@ -27,6 +27,7 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
+    projectsettings.cpp \
     registration.cpp \
     jsexecengine.cpp \
     loginwindow.cpp \
