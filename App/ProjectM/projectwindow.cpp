@@ -5,6 +5,7 @@
 #include "projectsettings.h"
 #include <QSettings>
 #include <QString>
+#include <QDebug>
 
 ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
     QDialog(parent),
@@ -50,10 +51,9 @@ void ProjectWindow::on_enabled_check_box_stateChanged(int arg1)
     this->project->enabled() = arg1;
     QSettings settings(COMPANY_NAME, APP_NAME);
     settings.beginGroup(ALL_PROJECTS_DIR);
-    settings.beginGroup(project->name());
+    settings.beginGroup(this->project->name());
 
-
-    settings.setValue(ProjectSettings::ENABLED, project->enabled());
+    settings.setValue(ProjectSettings::ENABLED, this->project->enabled());
     settings.sync();
 }
 
@@ -63,10 +63,11 @@ void ProjectWindow::on_wifi_check_box_stateChanged(int arg1)
     this->project->wifi_only() = arg1;
     QSettings settings(COMPANY_NAME, APP_NAME);
     settings.beginGroup(ALL_PROJECTS_DIR);
-    settings.beginGroup(project->name());
+    settings.beginGroup(this->project->name());
 
     settings.setValue(ProjectSettings::WIFI_ONLY, project->wifi_only());
-    settings.sync();}
+    settings.sync();
+}
 
 void ProjectWindow::on_plugged_in_check_box_stateChanged(int arg1)
 {
@@ -74,7 +75,8 @@ void ProjectWindow::on_plugged_in_check_box_stateChanged(int arg1)
 
     QSettings settings(COMPANY_NAME, APP_NAME);
     settings.beginGroup(ALL_PROJECTS_DIR);
-    settings.beginGroup(project->name());
+    settings.beginGroup(this->project->name());
 
-    settings.setValue(ProjectSettings::CHARGING_ONLY, project->plugged_in_only());
-    settings.sync();}
+    settings.setValue(ProjectSettings::CHARGING_ONLY, this->project->plugged_in_only());
+    settings.sync();
+}
