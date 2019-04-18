@@ -24,8 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
     project_list->append(Project("Project X", "???"));
 
     QStringList project_name_list;
-    for(int i=0;i<(*project_list).size();i++) {
-        project_name_list << QString::fromStdString((*project_list)[i].name());
+    Q_FOREACH(Project p, *project_list) {
+        project_name_list << p.name();
     }
 
     // Populate our model

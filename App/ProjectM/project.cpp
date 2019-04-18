@@ -1,6 +1,6 @@
 #include "project.h"
 
-Project::Project(std::string name, std::string short_desc, std::string full_desc, bool enabled, bool wifi_only, bool plugged_in_only)
+Project::Project(QString name, QString short_desc, QString full_desc, bool enabled, bool wifi_only, bool plugged_in_only)
 {
     this->name_ = name;
     this->short_desc_ = short_desc;
@@ -13,9 +13,9 @@ Project::Project(std::string name, std::string short_desc, std::string full_desc
     this->plugged_in_only_ = plugged_in_only;
 }
 
-auto Project::name() -> const std::string& { return this->name_; }
-auto Project::short_desc() -> const std::string& { return this->short_desc_; }
-auto Project::full_desc() -> const std::string& { return this->full_desc_; }
+auto Project::name() -> const QString& { return this->name_; }
+auto Project::short_desc() -> const QString& { return this->short_desc_; }
+auto Project::full_desc() -> const QString& { return this->full_desc_; }
 
 auto Project::enabled() -> bool& { return this->enabled_; }
 auto Project::wifi_only() -> bool& { return this->wifi_only_; }

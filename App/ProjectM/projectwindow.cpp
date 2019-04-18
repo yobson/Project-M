@@ -12,8 +12,8 @@ ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
     ui->setupUi(this);
     setWindowState((windowState() & ~(Qt::WindowMinimized | Qt::WindowFullScreen))
                        | Qt::WindowMaximized);
-    ui->project_name->setText(QString::fromStdString(project->name()));
-    ui->project_desc->setText(QString::fromStdString(project->full_desc()));
+    ui->project_name->setText(project->name());
+    ui->project_desc->setText(project->full_desc());
 
 
     //ui->enabled_check_box->setTristate(project->enabled());
@@ -26,15 +26,15 @@ ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
 
     //const char * enabled_setting_key = (project->name() + "_enabled_setting").c_str();
 
-    QString q_enabled_setting_key = QString::fromUtf8((project->name() + "_enabled_setting").c_str());
+    QString q_enabled_setting_key = project->name() + "_enabled_setting";
     bool enabled_setting = settings.value(q_enabled_setting_key,false).toBool();
     ui->enabled_check_box->setCheckState(enabled_setting ? Qt::Checked : Qt::Unchecked);
 
-    QString q_wifi_setting_key = QString::fromUtf8((project->name() + "_wifi_setting").c_str());
+    QString q_wifi_setting_key = project->name() + "_wifi_setting";
     bool wifi_setting = settings.value(q_wifi_setting_key,false).toBool();
     ui->wifi_check_box->setCheckState(wifi_setting ? Qt::Checked : Qt::Unchecked);
 
-    QString q_pluggedin_setting_key = QString::fromUtf8((project->name() + "_pluggedin_setting").c_str());
+    QString q_pluggedin_setting_key = project->name() + "_pluggedin_setting";
     bool pluggedin_setting = settings.value(q_pluggedin_setting_key,false).toBool();
     ui->plugged_in_check_box->setCheckState(pluggedin_setting ? Qt::Checked : Qt::Unchecked);
 
@@ -66,7 +66,7 @@ void ProjectWindow::on_enabled_check_box_stateChanged(int arg1)
     this->project->enabled() = arg1;
 
     QSettings settings;
-    QString q_enabled_setting_key = QString::fromUtf8((project->name() + "_enabled_setting").c_str());
+    QString q_enabled_setting_key = project->name() + "_enabled_setting";
     settings.setValue(q_enabled_setting_key,project->enabled());
 
 }
@@ -76,7 +76,7 @@ void ProjectWindow::on_wifi_check_box_stateChanged(int arg1)
 {
     this->project->wifi_only() = arg1;
     QSettings settings;
-    QString q_wifi_setting_key = QString::fromUtf8((project->name() + "_wifi_setting").c_str());
+    QString q_wifi_setting_key = project->name() + "_wifi_setting";
     settings.setValue(q_wifi_setting_key,project->wifi_only());
 }
 
@@ -85,6 +85,6 @@ void ProjectWindow::on_plugged_in_check_box_stateChanged(int arg1)
     this->project->plugged_in_only() = arg1;
 
     QSettings settings;
-    QString q_pluggedin_setting_key = QString::fromUtf8((project->name() + "_pluggedin_setting").c_str());
+    QString q_pluggedin_setting_key = project->name() + "_pluggedin_setting";
     settings.setValue(q_pluggedin_setting_key,project->plugged_in_only());
 }
