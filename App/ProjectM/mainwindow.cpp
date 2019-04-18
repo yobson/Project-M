@@ -4,6 +4,13 @@
 #include <QAndroidJniObject>
 #include "magic.h"
 
+QLinkedList<JSExecEngine::Project> sampleProjects() {
+    QLinkedList<JSExecEngine::Project> ps;
+    ps.append({"ExampleA", "The first example", ""});
+    ps.append({"ExampleB", "The second example", ""});
+    return ps;
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -13,9 +20,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QAndroidJniObject::callStaticMethod<void>("space/hobson/ProjectM/MService", "startMService", "(Landroid/content/Context;)V",
                                               QtAndroid::androidActivity().object());
 
+    /*
     engine = new JSExecEngine(PROJECT_BASE_IP);
     connect(engine, &JSExecEngine::get_projects_result, this, &MainWindow::on_get_projects);
     engine->get_projects();
+    */
+    on_get_projects(sampleProjects());
 }
 
 MainWindow::~MainWindow()

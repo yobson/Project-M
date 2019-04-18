@@ -106,6 +106,8 @@ void writeSampleProjectsToFile() {
     QSettings projects(COMPANY_NAME, APP_NAME);
     projects.beginGroup(ALL_PROJECTS_DIR);
 
+    projects.clear();
+
     projects.beginGroup("A");
     projects.setValue(ProjectSettings::ENABLED, true);
     projects.setValue(ProjectSettings::PROJECT_EXTENSION, "");
