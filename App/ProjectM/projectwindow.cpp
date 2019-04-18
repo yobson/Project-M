@@ -79,7 +79,6 @@ void ProjectWindow::on_plugged_in_check_box_stateChanged(int arg1)
     settings.beginGroup(ALL_PROJECTS_DIR);
     settings.beginGroup(this->project->name());
 
-
     settings.setValue(ProjectSettings::CHARGING_ONLY, this->project->plugged_in_only());
     settings.sync();
 }
