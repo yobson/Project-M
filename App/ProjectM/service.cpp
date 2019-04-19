@@ -16,6 +16,8 @@ Service::Service(QObject *parent) : QObject (parent)
 {
     // writeSampleProjectsToFile();
     projectEngines.clear();
+    qDebug() << "Trying to start notification";
+    //QAndroidJniObject *notification = new QAndroidJniObject("space/hobson/ProjectM/DisplayNotification", "(Landroid/content/Context;)V", QtAndroid::androidContext().object());
 }
 
 /** Check if the project should be run now. */

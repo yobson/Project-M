@@ -5,6 +5,8 @@
 #include "loginwindow.h"
 #include "service.h"
 #include <QAndroidService>
+#include <QAndroidJniObject>
+#include <QtAndroid>
 
 int main(int argc, char *argv[])
 {
@@ -20,6 +22,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     LoginWindow w;
     qDebug () << "Try to start service";
+    QAndroidJniObject::callStaticMethod<void>("space/hobson/ProjectM/MService", "startMService", "(Landroid/content/Context;)V",
+                                              QtAndroid::androidActivity().object());
     w.show();
     qDebug() << "Starting event loop";
     return a.exec();
