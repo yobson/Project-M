@@ -1,7 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QtAndroid>
-#include <QAndroidJniObject>
 #include "magic.h"
 #include <QSettings>
 
@@ -18,8 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QAndroidJniObject::callStaticMethod<void>("space/hobson/ProjectM/MService", "startMService", "(Landroid/content/Context;)V",
-                                              QtAndroid::androidActivity().object());
 
     engine = new JSExecEngine(PROJECT_BASE_IP);
     connect(engine, &JSExecEngine::get_projects_result, this, &MainWindow::on_get_projects);

@@ -59,3 +59,4 @@ auto Project::url() -> const QString& { return this->url_; }
 auto Project::enabled() -> bool& { return this->enabled_; }
 auto Project::wifi_only() -> bool& { return this->wifi_only_; }
 auto Project::plugged_in_only() -> bool& { return this->plugged_in_only_; }
+auto Project::frequency() -> int& { return this->frequency_; }

@@ -10,4 +10,4 @@ const QString ProjectSettings::MIN_BATTERY_LEVEL = "Minimum Battery Level";
 const QString ProjectSettings::TIME_FRAME_START = "Time Frame Start";
 const QString ProjectSettings::TIME_FRAME_END = "Time Frame End";
 
-const int ProjectSettings::CHECKING_FREQ = 5000;
+const int ProjectSettings::CHECKING_FREQ = 10000;

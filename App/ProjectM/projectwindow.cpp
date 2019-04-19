@@ -33,6 +33,10 @@ ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
     assert(settings.contains(ProjectSettings::CHARGING_ONLY));
     bool pluggedin_setting = settings.value(ProjectSettings::CHARGING_ONLY).toBool();
     ui->plugged_in_check_box->setCheckState(pluggedin_setting ? Qt::Checked : Qt::Unchecked);
+
+    assert(settings.contains(ProjectSettings::FREQUENCY));
+    int freq = settings.value(ProjectSettings::FREQUENCY).toInt();
+    ui->freq_slider->setValue(sliderFromSeconds(freq));
 }
 
 ProjectWindow::~ProjectWindow()
@@ -75,4 +79,38 @@ void ProjectWindow::on_plugged_in_check_box_stateChanged(int arg1)
 
     settings.setValue(ProjectSettings::CHARGING_ONLY, this->project->plugged_in_only());
     settings.sync();
+}
+
+void ProjectWindow::on_freq_slider_valueChanged(int value)
+{
+    int sec = sliderToSeconds(value);
+    this->project->frequency() = sec;
+    ui->freq_text->setText(freq_text(value));
+
+    QSettings settings(COMPANY_NAME, APP_NAME);
+    settings.beginGroup(ALL_PROJECTS_DIR);
+    settings.beginGroup(this->project->name());
+
+    settings.setValue(ProjectSettings::FREQUENCY, this->project->frequency());
+    settings.sync();
+
+}
+
+int ProjectWindow::sliderToSeconds(int slid)
+{
+   if (slid == 1) return 30;
+   return (slid-1) * 60;
+}
+
+int ProjectWindow::sliderFromSeconds(int secs)
+{
+    if (secs == 30) return 1;
+    return secs / 60;
+}
+
+QString ProjectWindow::freq_text(int slid)
+{
+    if (slid == 1) return QString("Every 30 seconds");
+    if (slid == 2) return QString("Every minute");
+    return "Every " + QString::number(slid-1) + " minutes";
 }

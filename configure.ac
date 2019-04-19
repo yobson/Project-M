@@ -28,7 +28,7 @@ AC_ARG_ENABLE([server],
 AC_ARG_WITH([live-address],
               AS_HELP_STRING([--with-live-address], [Set live server address for app]),
               server_addr="$withval",
-              server_addr="localhost:3000")
+              server_addr="www.hobson.space")
 
 AC_ARG_WITH([projects-list],
             AS_HELP_STRING([--with-projects-list], [set path to projects list file. Defaults to /tmp/projectList.txt]),
@@ -123,7 +123,7 @@ if test "$build_app" == "yes"; then
   AC_MSG_NOTICE([Building mobile app makefiles])
   if test -d build; then rm -fr build; fi
   mkdir -p build
-  $qmake_exec App/ProjectM/ProjectM.pro -o build/Makefile 'DEFINES+=PROJECT_BASE_IP=\\\"$server_addr\\\"'
+  $qmake_exec App/ProjectM/ProjectM.pro -o build/Makefile DEFINES+=PROJECT_BASE_IP=\\\'\\\"$server_addr\\\"\\\'
 fi
 
 if test "$build_server" == "yes"; then
