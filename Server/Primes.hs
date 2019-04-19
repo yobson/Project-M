@@ -1,10 +1,10 @@
 import ProjectM
 
-type State = (Int, Int, Int) -- Largest, Last Checked, ID of largest
+type State = (Integer, Integer, Int) -- Largest, Last Checked, ID of largest
 
 jsMin = "(function(id, number){var n = parseInt(number); for (var i = 2; i <= Math.sqrt(n); i++) {if (n % i == 0){return id + \" \" + 0}} return id + \" \" + n;})" -- JS goes here
 
-genPage :: Int -> Int -> String
+genPage :: Integer -> Int -> String
 genPage prime id = concat ["<head><meta http-equiv=\"refresh\" content=\"5\"><script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js\"></script>",
   "<link href=\"https://fonts.googleapis.com/css?family=Lato:400,700%7CMerriweather:300,700%7CSource+Code+Pro:400,700\" rel=\"stylesheet\">",
   "<link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.3.1/css/all.css\" integrity=\"sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU\" crossorigin=\"anonymous\" />",
@@ -16,7 +16,7 @@ genPage prime id = concat ["<head><meta http-equiv=\"refresh\" content=\"5\"><sc
   "<h3 id=\"finder\">Finder: ", show id,
   "</h3></body>"]
 
-updater :: Updater State Int
+updater :: Updater State Integer
 updater state             RequestJS      = (state, Send jsMin)
 updater state@(lg,ch,id)  RequestInput   = ((lg,ch+1,id), Send $ show (ch+1))
 updater state@(lg,ch,id) (ReturnAns n i) | i > lg    = ((i,ch,n), Yeet)
