@@ -84,13 +84,6 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QPushButton" name="skip_btn">
-        <property name="text">
-         <string>Skip (Testing only)</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="register_btn">
         <property name="text">
          <string>Register</string>
