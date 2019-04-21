@@ -37,18 +37,18 @@
 
 - [x] Get tasks list
 - [x] Run task
-- [ ] Schedule the nieve way
+- [x] Schedule the nieve way
 
-### After that:
+### Tasks we would like:
 
-- [ ] JS library with phone censors
 - [x] Track 'wealth'
 - [x] Get\register ID
-- [ ] Better scheduler (when screen off etc)
+- [x] Better scheduler (when screen off etc)
 
-### After $ after that:
+### Tasks we really don't need to do... but want to do:
 
-- [ ] API for getting 'wealth'
+- [x] API for getting 'wealth'
+- [ ] JS library with phone censors (Might add for demo)
 - [ ] More security!!!
 - [ ] Make it look pretty
 
