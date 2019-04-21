@@ -9,6 +9,7 @@
 #include "testpage.h"
 #include "project.h"
 #include "projectwindow.h"
+#include "jsexecengine.h"
 
 namespace Ui {
 class MainWindow;
@@ -24,17 +25,21 @@ public:
 
 private slots:
     void on_james_test_btn_clicked();
-
+    void on_get_projects(QLinkedList<JSExecEngine::Project> p);
     void on_project_list_view_clicked(const QModelIndex &index);
+
+    void on_refresh_btn_clicked();
 
 private:
     Ui::MainWindow *ui;
     TestPage *tp = nullptr;
 
-    ProjectWindow *projectWindow;
-    QStringListModel *project_list_model;
-    QList<Project> *project_list;
-    QStringList *project_name_list;
+    ProjectWindow *projectWindow = nullptr;
+    QStringListModel *project_list_model = nullptr;
+    QList<Project> *project_list = nullptr;
+    QStringList *project_name_list = nullptr;
+    JSExecEngine *engine;
+
 };
 
 #endif // MAINWINDOW_H

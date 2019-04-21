@@ -12,7 +12,7 @@
   - Schedule runs (in background)
   - run in background
 - JS
-  - Write library to get data and send results
+  - Write library to get data ~~and send results~~
 
 ### Running order
 
@@ -28,7 +28,7 @@
 1. When scheduled, request project page in background
 2. Server gets requests, possibly customises response, sends JS back
 3. phone runs JS (this is done automatically me thinks)
-4. JS library sends results back to server (AJAX Jobby)
+4. ~~JS library~~ Qt app sends results back to server ~~(AJAX Jobby)~~
 5. Server updates users 'wealth'
 
 ## Roadmap
@@ -37,18 +37,18 @@
 
 - [x] Get tasks list
 - [x] Run task
-- [ ] Schedule the nieve way
+- [x] Schedule the nieve way
 
-### After that:
+### Tasks we would like:
 
-- [ ] JS library with phone censors
 - [x] Track 'wealth'
 - [x] Get\register ID
-- [ ] Better scheduler (when screen off etc)
+- [x] Better scheduler (when screen off etc)
 
-### After $ after that:
+### Tasks we really don't need to do... but want to do:
 
-- [ ] API for getting 'wealth'
+- [x] API for getting 'wealth'
+- [ ] JS library with phone censors (Might add for demo)
 - [ ] More security!!!
 - [ ] Make it look pretty
 

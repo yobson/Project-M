@@ -63,7 +63,7 @@
     </activity>
 
     <!-- For adding service(s) please check: https://wiki.qt.io/AndroidServices -->
-<service android:process=":qt" android:name="space.hobson.ProjectM.MService">
+        <service android:process=":qt" android:name="space.hobson.ProjectM.MService">
         <!-- android:process=":qt" is needed to force the service to run on a separate process than the Activity -->
 
             <!-- Application arguments -->
@@ -112,11 +112,18 @@
 
     <!-- The following comment will be replaced upon deployment with default permissions based on the dependencies of the application.
          Remove the comment if you do not require these default permissions. -->
-    <!-- %%INSERT_PERMISSIONS -->
 
     <!-- The following comment will be replaced upon deployment with default features based on the dependencies of the application.
          Remove the comment if you do not require these default features. -->
+
+
+
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+<!-- %%INSERT_PERMISSIONS -->
     <!-- %%INSERT_FEATURES -->
 
-<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 </manifest>

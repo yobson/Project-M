@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui qml network androidextras
+QT       += core gui qml network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,6 +27,7 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
+    projectsettings.cpp \
     registration.cpp \
     jsexecengine.cpp \
     loginwindow.cpp \
@@ -46,7 +47,8 @@ HEADERS += \
     logger.h \
     service.h \
     projectwindow.h \
-    project.h
+    project.h \
+    projectsettings.h
 
 FORMS += \
         mainwindow.ui \
@@ -71,9 +73,11 @@ DISTFILES += \
     android/res/values/libs.xml \
     android/build.gradle \
     android/gradle/wrapper/gradle-wrapper.properties \
-    android/gradlew.bat
+    android/gradlew.bat \
+    android/src/space/hobson/ProjectM/MService.java \
+    android/src/space/hobson/ProjectM/Helpers.java
 
-contains(ANDROID_TARGET_ARCH,arm64-v8a) {
-    ANDROID_PACKAGE_SOURCE_DIR = \
-        $$PWD/android
+android: {
+    QT += androidextras
+    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 }

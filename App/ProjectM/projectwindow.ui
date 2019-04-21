@@ -25,7 +25,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QWidget" name="formWidget" native="true">
      <property name="sizePolicy">
@@ -68,30 +68,53 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="project_desc_label">
+       <widget class="QLabel" name="label">
         <property name="text">
-         <string>Description</string>
+         <string>Frequency:</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="project_desc">
-        <property name="text">
-         <string>project_desc</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QSlider" name="freq_slider">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>11</number>
+          </property>
+          <property name="pageStep">
+           <number>1</number>
+          </property>
+          <property name="value">
+           <number>6</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="freq_text">
+          <property name="text">
+           <string>freq</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label_5">
+       <widget class="QLabel" name="project_desc_label">
         <property name="text">
-         <string>TextLabel</string>
+         <string>Description:</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLabel" name="label_6">
+       <widget class="QLabel" name="project_desc">
         <property name="text">
-         <string>TextLabel</string>
+         <string>project_desc</string>
         </property>
        </widget>
       </item>
