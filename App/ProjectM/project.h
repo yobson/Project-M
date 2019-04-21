@@ -23,6 +23,7 @@ private:
     QString full_desc_;
     QString url_;
     int frequency_;
+	string freq_labels_[]
     bool enabled_;
     bool wifi_only_;
     bool plugged_in_only_;
