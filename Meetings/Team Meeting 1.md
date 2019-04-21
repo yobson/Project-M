@@ -12,7 +12,7 @@
   - Schedule runs (in background)
   - run in background
 - JS
-  - Write library to get data and send results
+  - Write library to get data ~~and send results~~
 
 ### Running order
 
@@ -28,7 +28,7 @@
 1. When scheduled, request project page in background
 2. Server gets requests, possibly customises response, sends JS back
 3. phone runs JS (this is done automatically me thinks)
-4. JS library sends results back to server (AJAX Jobby)
+4. ~~JS library~~ Qt app sends results back to server ~~(AJAX Jobby)~~
 5. Server updates users 'wealth'
 
 ## Roadmap
