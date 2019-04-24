@@ -4,6 +4,7 @@
 #include "project.h"
 
 #include <QDialog>
+#include <vector>
 
 namespace Ui {
 class ProjectWindow;
