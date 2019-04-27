@@ -6,7 +6,7 @@
 #include <QSettings>
 #include <QString>
 #include <QDebug>
->
+
 
 ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
     QDialog(parent),
