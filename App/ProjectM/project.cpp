@@ -15,7 +15,7 @@ Project::Project(QString name, QString short_desc, QString full_desc, QString UR
     else
         this->full_desc_ = full_desc;
 	
-	this->*freq_labels_ = &freq_labels;  //are these correct?
+    this->*freq_labels_ = &freq_labels;  //are these correct?
 	
 	this->freq_values_ = freq_values;
 
