@@ -85,6 +85,19 @@ void JSExecEngine::run_project()
     logger << QString("Requested js ") + instr->request->url().toString();
 }
 
+void JSExecEngine::get_score()
+{
+    QString userID = getUserID();
+    nethub_poll *instr = new nethub_poll();
+    instr->queryType = getUser;
+    instr->userID = new QString(userID);
+    instr->returnSignal = retScore;
+    buildRequest(instr);
+    QNetworkReply *reply = netHub->get(*instr->request);
+    connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
+    logger << QString("Started score check ") + instr->request->url().toString();
+}
+
 bool JSExecEngine::standardEnd(QString *check)
 {
     int len = check->length();
@@ -173,6 +186,20 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
         case existsUser : {
             if (data.startsWith("{}")) emit exists_user_result(false);
             else emit exists_user_result(true);
+            deleteNethubPoll(instr);
+            break;
+        }
+        case retScore : {
+            if (data.startsWith("{}")) {
+                deleteNethubPoll(instr);
+                return;
+            }
+            QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(data).toUtf8());
+            QJsonObject obj;
+            if (doc.isNull() || !doc.isObject()) return;
+            obj = doc.object();
+            emit get_score_result(obj["score"].toInt());
+            logger << QString("The user score is:") += QString::number(obj["score"].toInt());
             deleteNethubPoll(instr);
             break;
         }

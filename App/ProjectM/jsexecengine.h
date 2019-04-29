@@ -25,6 +25,7 @@ public:
     void register_user(QString firstName, QString lastName);
     void get_projects();
     void run_project();
+    void get_score();
     typedef struct {
         QString name;
         QString description;
@@ -33,13 +34,14 @@ public:
 
 signals:
     void exists_user_result(bool);
+    void get_score_result(int);
     void register_user_result(QString);
     void get_projects_result(QLinkedList<Project>);
     void web_error(QNetworkReply::NetworkError);
 
 private:
     enum query_type {getUser, regUser, noQuery, getProjs, getJS, getJSInput, returnJS};
-    enum return_signal {existsUser, userReg, noSignal, retProjs, jsReady, jsInputReady};
+    enum return_signal {existsUser, userReg, noSignal, retProjs, jsReady, jsInputReady, retScore};
     typedef struct {
         QString firstName;
         QString lastName;

@@ -2,7 +2,7 @@ TARGETS = main.cgi
 
 all : $(TARGETS)
 
-primes : all Primes.cgi
+primes : main.cgi Primes.cgi
 
 CC = ghc
 

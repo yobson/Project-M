@@ -19,19 +19,9 @@
      <widget class="QListView" name="project_list_view"/>
     </item>
     <item>
-     <widget class="QLabel" name="label">
+     <widget class="QPushButton" name="refresh_btn">
       <property name="text">
-       <string>Main Window</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="james_test_btn">
-      <property name="text">
-       <string>James's Beta Page</string>
+       <string>Refresh</string>
       </property>
      </widget>
     </item>
