@@ -2,8 +2,10 @@
 #include "magic.h"
 #include "projectsettings.h"
 #include <QSettings>
+#include <vector>
 
-Project::Project(QString name, QString short_desc, QString full_desc, QString URL, int frequency, bool enabled, bool wifi_only, bool plugged_in_only)
+Project::Project(QString name, QString short_desc, QString full_desc, QString URL, int frequency, bool enabled, bool wifi_only, bool plugged_in_only,
+    QString (*freq_label)(int), std::vector<int> freq_values)
 {
     this->name_ = name;
 
@@ -12,6 +14,10 @@ Project::Project(QString name, QString short_desc, QString full_desc, QString UR
         this->full_desc_ = short_desc;
     else
         this->full_desc_ = full_desc;
+	
+    this->freq_label = freq_label;  //are these correct?
+	
+	this->freq_values_ = freq_values;
 
     QSettings settings(COMPANY_NAME, APP_NAME);
     settings.beginGroup(ALL_PROJECTS_DIR);
@@ -60,3 +66,4 @@ auto Project::enabled() -> bool& { return this->enabled_; }
 auto Project::wifi_only() -> bool& { return this->wifi_only_; }
 auto Project::plugged_in_only() -> bool& { return this->plugged_in_only_; }
 auto Project::frequency() -> int& { return this->frequency_; }
+auto Project::freq_values() -> std::vector<int>& { return this->freq_values_; }

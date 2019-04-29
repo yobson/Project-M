@@ -16,26 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QAndroidJniObject::callStaticMethod<void>("space/hobson/ProjectM/MService", "startMService", "(Landroid/content/Context;)V",
-                                              QtAndroid::androidActivity().object());
-
-    /** List view with projects set-up */
-    // Create model
-    project_list_model = new QStringListModel(this);
-
-    /// TODO: Get real data
-    // Make mock data
-    project_list = new QList<Project>();
-    project_list->append(Project("PrimesAAAA", "Calculate Primes"));
-    project_list->append(Project("Pollution", "Crowdsourced pollution measurement"));
-    project_list->append(Project("Project X", "???"));
-
-    QStringList project_name_list;
-    for(int i=0;i<(*project_list).size();i++) {
-        project_name_list << QString::fromStdString((*project_list)[i].name());
-    }
-
-
     engine = new JSExecEngine(PROJECT_BASE_IP);
     connect(engine, &JSExecEngine::get_projects_result, this, &MainWindow::on_get_projects);
     engine->get_projects();
@@ -92,11 +72,7 @@ void MainWindow::on_project_list_view_clicked(const QModelIndex &index)
 {
     projectWindow = new ProjectWindow(&(*project_list)[index.row()], this);
     projectWindow->show();
-    //got rid of line below so pressing back on a project page takes
-    //user back to list of projects
-    //But pressing back does not run the projectwindow destructor so
-    //settings arent saved!! ugh
-    //this->hide();
+
 }
 
 void MainWindow::on_refresh_btn_clicked()
@@ -105,4 +81,5 @@ void MainWindow::on_refresh_btn_clicked()
    project_name_list->clear();
    engine->get_projects();
    engine->get_score();
+
 }
