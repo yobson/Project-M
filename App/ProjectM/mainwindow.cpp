@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     engine->get_projects();
 
     // on_get_projects(sampleProjects());
+    engine->get_score();
 }
 
 MainWindow::~MainWindow()
@@ -79,4 +80,5 @@ void MainWindow::on_refresh_btn_clicked()
    project_list->clear();
    project_name_list->clear();
    engine->get_projects();
+   engine->get_score();
 }
