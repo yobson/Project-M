@@ -24,6 +24,7 @@ public:
     auto frequency() -> int&;
     auto freq_labels(int slid) -> const QString&; //how to say int->QString function?
 	auto freq_values() -> std::vector<int>&;
+    QString (*freq_label)(int);
 
 private:
     QString name_;
@@ -31,7 +32,8 @@ private:
     QString full_desc_;
     QString url_;
     int frequency_;
-	QString freq_labels_(int slid);      //function from slider position {0,1,2,3,4} to a label
+    //QString freq_labels_(int slid);      //function from slider position {0,1,2,3,4} to a label
+
 	std::vector<int> freq_values_;              //array of ints corresponding to labels eg "1 min" <-> 60
     bool enabled_;
     bool wifi_only_;

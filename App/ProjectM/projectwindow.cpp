@@ -134,10 +134,10 @@ int ProjectWindow::sliderFromSeconds(int secs)
 	std::vector<int> vals = this->project->freq_values();
 	std::vector<int>::iterator it = std::find(vals.begin(), vals.end(), secs);
 	int x = -1;
-	if (it != vals.end())
-     { x = it - vals.begin(); }
+
+	if (it != vals.end()){ x = it - vals.begin(); }
 	 
-	 return x;
+    return x;
 	
 	
 }
@@ -150,5 +150,5 @@ QString ProjectWindow::freq_text(int slid)
     return "Every " + QString::number(slid-1) + " minutes";
 	*/
 	
-	return this->project->freq_labels(slid);
+    return this->project->freq_label(slid);
 }

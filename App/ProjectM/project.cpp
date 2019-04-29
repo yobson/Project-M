@@ -5,7 +5,7 @@
 #include <vector>
 
 Project::Project(QString name, QString short_desc, QString full_desc, QString URL, int frequency, bool enabled, bool wifi_only, bool plugged_in_only,
-	QString (*freq_labels)(int), std::vector<int> freq_values)
+    QString (*freq_label)(int), std::vector<int> freq_values)
 {
     this->name_ = name;
 
@@ -15,7 +15,7 @@ Project::Project(QString name, QString short_desc, QString full_desc, QString UR
     else
         this->full_desc_ = full_desc;
 	
-    this->*freq_labels_ = &freq_labels;  //are these correct?
+    this->freq_label = freq_label;  //are these correct?
 	
 	this->freq_values_ = freq_values;
 
@@ -66,5 +66,4 @@ auto Project::enabled() -> bool& { return this->enabled_; }
 auto Project::wifi_only() -> bool& { return this->wifi_only_; }
 auto Project::plugged_in_only() -> bool& { return this->plugged_in_only_; }
 auto Project::frequency() -> int& { return this->frequency_; }
-auto Project::freq_labels(int slid) -> const QString& { static QString label = freq_labels(slid); return label; } //are these two correct?
 auto Project::freq_values() -> std::vector<int>& { return this->freq_values_; }
