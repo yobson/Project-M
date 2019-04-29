@@ -10,13 +10,46 @@
     <height>480</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QListView" name="project_list_view"/>
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Enabled Projects</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QListView" name="proj_list_view_en"/>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Disabled Projects</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QListView" name="proj_list_view_dis">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QPushButton" name="refresh_btn">
