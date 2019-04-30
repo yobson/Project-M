@@ -33,6 +33,12 @@ private slots:
 
 
 
+    void on_proj_list_view_dis_clicked(const QModelIndex &index);
+
+    void on_proj_list_view_en_clicked(const QModelIndex &index);
+
+    void on_proj_list_view_dis_pressed(const QModelIndex &index);
+
 private:
     Ui::MainWindow *ui;
     TestPage *tp = nullptr;

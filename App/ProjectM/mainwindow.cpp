@@ -58,23 +58,37 @@ void MainWindow::on_get_projects(QLinkedList<JSExecEngine::Project> ps)
     if (project_name_list_dis == nullptr) project_name_list_dis = new QStringList();
 
     Q_FOREACH(JSExecEngine::Project p, ps) {
-        //decide which listview to add the project to
-        //no! not p.enabled but rather need to access the settings for that project
-        //and see if its enabled there!!
+        //add default settings if project is new?
+
+        Project* currentProj = new Project(p.name, p.description, "", p.URL);
 
         //Get the enabled setting for that project
         QSettings settings(COMPANY_NAME, APP_NAME);
         settings.beginGroup(ALL_PROJECTS_DIR);
-        settings.beginGroup(p.name);
+        settings.beginGroup(currentProj->name());
+
+        //------------
+        if (!settings.contains(ProjectSettings::FREQUENCY)) { qDebug() << "NO FREQ SETTING!!!!"; }
+        else { qDebug() << "THRE IS A FREQ SETTING"; }
+
+        if (!settings.contains(ProjectSettings::ENABLED)) { qDebug() << "NO ENABLD SETTING!!!!"; }
+        else { qDebug() << "THRE IS A ENABLD SETTING"; }
+
+        qDebug() << "mainwindow projname is: " << settings.group() << currentProj->name();
+
+        //------------
+
         bool enabled = settings.value(ProjectSettings::ENABLED).toBool();
 
         if(enabled){
-            project_list_en->append(Project(p.name, p.description, "", p.URL));
-            *project_name_list_en << p.name;
+            //project_list_en->append(Project(p.name, p.description, "", p.URL));
+            project_list_en->append(*currentProj);
+            *project_name_list_en << currentProj->name();
         }
         else{
-            project_list_dis->append(Project(p.name, p.description, "", p.URL));
-            *project_name_list_dis << p.name;
+            //project_list_dis->append(Project(p.name, p.description, "", p.URL));
+            project_list_dis->append(*currentProj);
+            *project_name_list_dis << currentProj->name();
         }
     }
 
@@ -101,9 +115,11 @@ void MainWindow::on_get_projects(QLinkedList<JSExecEngine::Project> ps)
     ui->proj_list_view_dis->setModel(project_list_model_dis);
 }
 
+
 void MainWindow::on_project_list_view_en_clicked(const QModelIndex &index)
 {
     projectWindow = new ProjectWindow(&(*project_list_en)[index.row()], this);
+    qDebug() << "Clicked on enabled project";
     projectWindow->show();
 
 }
@@ -111,9 +127,11 @@ void MainWindow::on_project_list_view_en_clicked(const QModelIndex &index)
 void MainWindow::on_project_list_view_dis_clicked(const QModelIndex &index)
 {
     projectWindow = new ProjectWindow(&(*project_list_dis)[index.row()], this);
+    qDebug() << "Clicked on disbaled project";
     projectWindow->show();
 
 }
+
 
 //do the above method for both lists
 
@@ -127,3 +145,38 @@ void MainWindow::on_refresh_btn_clicked()
    engine->get_score();
 
 }
+
+void MainWindow::on_proj_list_view_dis_clicked(const QModelIndex &index)
+{
+    qDebug() << "Clicked on disabled project 111111";
+
+    //-------------
+    QSettings settings(COMPANY_NAME, APP_NAME);
+    settings.beginGroup(ALL_PROJECTS_DIR);
+    settings.beginGroup((*project_list_dis)[index.row()].name());
+    settings.sync();
+
+    qDebug() << "projname before call " << settings.group() << (*project_list_dis)[index.row()].name();
+
+    if (!settings.contains(ProjectSettings::FREQUENCY)) { qDebug() << "NO FREQ SETTING222!!!!"; }
+    else { qDebug() << "THRE IS A FREQ SETTING222"; }
+
+    if (!settings.contains(ProjectSettings::ENABLED)) { qDebug() << "NO ENABLD SETTING222!!!!"; }
+    else { qDebug() << "THRE IS A ENABLD SETTING222"; }
+    //-------------
+
+    projectWindow = new ProjectWindow(&(*project_list_dis)[index.row()], this);
+    qDebug() << "Clicked on disabled project 2222222";
+    projectWindow->show();
+
+}
+
+void MainWindow::on_proj_list_view_en_clicked(const QModelIndex &index)
+{
+    qDebug() << "Clicked on enabled project 111111";
+    projectWindow = new ProjectWindow(&(*project_list_en)[index.row()], this);
+    qDebug() << "Clicked on enabled project 222222";
+    projectWindow->show();
+}
+
+

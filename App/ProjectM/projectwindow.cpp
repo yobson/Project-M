@@ -27,6 +27,9 @@ ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
     settings.beginGroup(ALL_PROJECTS_DIR);
     settings.beginGroup(project->name());
 
+    qDebug() << "projectwindow projname is " << settings.group() << project->name();
+
+
     assert(settings.contains(ProjectSettings::ENABLED));
     bool enabled_setting = settings.value(ProjectSettings::ENABLED).toBool();
     ui->enabled_check_box->setCheckState(enabled_setting ? Qt::Checked : Qt::Unchecked);
