@@ -27,9 +27,6 @@ ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
     settings.beginGroup(ALL_PROJECTS_DIR);
     settings.beginGroup(project->name());
 
-    qDebug() << "projectwindow projname is " << settings.group() << project->name();
-
-
     assert(settings.contains(ProjectSettings::ENABLED));
     bool enabled_setting = settings.value(ProjectSettings::ENABLED).toBool();
     ui->enabled_check_box->setCheckState(enabled_setting ? Qt::Checked : Qt::Unchecked);
@@ -45,13 +42,14 @@ ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
     assert(settings.contains(ProjectSettings::FREQUENCY));
     int freq = settings.value(ProjectSettings::FREQUENCY).toInt();
     ui->freq_slider->setValue(sliderFromSeconds(freq));
+    ui->freq_text->setText(freq_text(sliderFromSeconds(freq)));
 
 }
 
 ProjectWindow::~ProjectWindow()
 {
     /// TODO: update project settings;
-
+    qDebug() << "exiting projectwindow";
     delete ui;
 }
 

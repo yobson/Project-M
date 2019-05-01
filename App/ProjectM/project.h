@@ -9,10 +9,13 @@ class Project
 public:
     Project(QString name, QString short_desc, QString full_desc = "", QString URL = "", int frquency = 300,
 		bool enabled = false, bool wifi_only = true, bool plugged_in_only = true, 
-		QString (*freq_label)(int) = [](int slid){  if (slid == 1) return QString("Every 30 seconds");
-													if (slid == 2) return QString("Every minute");
-													return "Every " + QString::number(slid-1) + " minutes"; }, 
-		std::vector<int> freq_values = {30, 60, 120, 300, 600} );
+        QString (*freq_label)(int) = [](int slid){  if (slid == 0) return QString("Every 10 seconds");
+                                                    if (slid == 1) return QString("Every 30 seconds");
+                                                    if (slid == 2 || slid == 3) return "Every " + QString::number(slid-1) + " minutes";
+                                                    return "Every " + QString::number((slid-3)*5) + " minutes"; },
+        std::vector<int> freq_values = {10, 30, 60, 120, 300, 600} );
+
+
     auto name() -> const QString&;
     auto short_desc() -> const QString&;
     auto full_desc() -> const QString&;

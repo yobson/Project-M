@@ -9,8 +9,6 @@ Project::Project(QString name, QString short_desc, QString full_desc, QString UR
     QString (*freq_label)(int), std::vector<int> freq_values)
 {
 
-    //qDebug() << "Created a Project::Project";
-
     this->name_ = name;
 
     this->short_desc_ = short_desc;
@@ -26,8 +24,6 @@ Project::Project(QString name, QString short_desc, QString full_desc, QString UR
     QSettings settings(COMPANY_NAME, APP_NAME);
     settings.beginGroup(ALL_PROJECTS_DIR);
     settings.beginGroup(name);
-
-    qDebug() << "project.cpp projname is: " << settings.group() << name;
 
     this->url_ = URL;
     settings.setValue(ProjectSettings::PROJECT_EXTENSION, URL);

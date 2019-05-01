@@ -49,6 +49,9 @@ void MainWindow::on_james_test_btn_clicked()
 
 void MainWindow::on_get_projects(QLinkedList<JSExecEngine::Project> ps)
 {
+
+    ps += sampleProjects();
+
     if (project_list_model_en == nullptr) project_list_model_en = new QStringListModel(this);
     if (project_list_en == nullptr) project_list_en = new QList<Project>();
     if (project_name_list_en == nullptr) project_name_list_en = new QStringList();
@@ -66,18 +69,6 @@ void MainWindow::on_get_projects(QLinkedList<JSExecEngine::Project> ps)
         QSettings settings(COMPANY_NAME, APP_NAME);
         settings.beginGroup(ALL_PROJECTS_DIR);
         settings.beginGroup(currentProj->name());
-
-        //------------
-        if (!settings.contains(ProjectSettings::FREQUENCY)) { qDebug() << "NO FREQ SETTING!!!!"; }
-        else { qDebug() << "THRE IS A FREQ SETTING"; }
-
-        if (!settings.contains(ProjectSettings::ENABLED)) { qDebug() << "NO ENABLD SETTING!!!!"; }
-        else { qDebug() << "THRE IS A ENABLD SETTING"; }
-
-        qDebug() << "mainwindow projname is: " << settings.group() << currentProj->name();
-
-        //------------
-
         bool enabled = settings.value(ProjectSettings::ENABLED).toBool();
 
         if(enabled){
@@ -90,8 +81,9 @@ void MainWindow::on_get_projects(QLinkedList<JSExecEngine::Project> ps)
             project_list_dis->append(*currentProj);
             *project_name_list_dis << currentProj->name();
         }
-    }
 
+        settings.sync();
+    }
 
 
     // Delete from QSettings the projects that are not returned by the server anymore
@@ -99,10 +91,11 @@ void MainWindow::on_get_projects(QLinkedList<JSExecEngine::Project> ps)
     settings.beginGroup(ALL_PROJECTS_DIR);
     QStringList projectNames = settings.childGroups();
     for (auto projectName : projectNames) {
-        if (!project_name_list_en->contains(projectName) || !project_name_list_dis->contains(projectName)){
+        if (!(project_name_list_en->contains(projectName) || project_name_list_dis->contains(projectName))){
             settings.remove(projectName);
         }
     }
+
     settings.sync();
 
 
@@ -132,9 +125,6 @@ void MainWindow::on_project_list_view_dis_clicked(const QModelIndex &index)
 
 }
 
-
-//do the above method for both lists
-
 void MainWindow::on_refresh_btn_clicked()
 {
    project_list_en->clear();
@@ -148,35 +138,21 @@ void MainWindow::on_refresh_btn_clicked()
 
 void MainWindow::on_proj_list_view_dis_clicked(const QModelIndex &index)
 {
-    qDebug() << "Clicked on disabled project 111111";
-
-    //-------------
-    QSettings settings(COMPANY_NAME, APP_NAME);
-    settings.beginGroup(ALL_PROJECTS_DIR);
-    settings.beginGroup((*project_list_dis)[index.row()].name());
-    settings.sync();
-
-    qDebug() << "projname before call " << settings.group() << (*project_list_dis)[index.row()].name();
-
-    if (!settings.contains(ProjectSettings::FREQUENCY)) { qDebug() << "NO FREQ SETTING222!!!!"; }
-    else { qDebug() << "THRE IS A FREQ SETTING222"; }
-
-    if (!settings.contains(ProjectSettings::ENABLED)) { qDebug() << "NO ENABLD SETTING222!!!!"; }
-    else { qDebug() << "THRE IS A ENABLD SETTING222"; }
-    //-------------
-
     projectWindow = new ProjectWindow(&(*project_list_dis)[index.row()], this);
-    qDebug() << "Clicked on disabled project 2222222";
+    qDebug() << "Clicked on disabled project";
     projectWindow->show();
-
 }
 
 void MainWindow::on_proj_list_view_en_clicked(const QModelIndex &index)
 {
-    qDebug() << "Clicked on enabled project 111111";
     projectWindow = new ProjectWindow(&(*project_list_en)[index.row()], this);
-    qDebug() << "Clicked on enabled project 222222";
+    qDebug() << "Clicked on enabled project";
     projectWindow->show();
 }
 
 
+//qt expects this to be here and cant work out how to make it not expect it :(
+void MainWindow::on_proj_list_view_dis_pressed(const QModelIndex &index)
+{
+
+}
