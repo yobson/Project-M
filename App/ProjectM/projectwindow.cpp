@@ -63,6 +63,7 @@ void ProjectWindow::on_enabled_check_box_stateChanged(int arg1)
 
     settings.setValue(ProjectSettings::ENABLED, this->project->enabled());
     settings.sync();
+    emit enabled_change();
 
 }
 

@@ -312,7 +312,8 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
         }
         case prepPermissions : {
             if (data.startsWith("{}")) {
-                return;
+                prep_permissions(instr);
+                break;
             }
             QString ret = QString::fromUtf8(data).toUtf8();
             QStringList perms = ret.split(':');
@@ -356,11 +357,6 @@ QString JSExecEngine::getUserID()
     return "";
 }
 
-void JSExecEngine::getRequestedPhoneData(JSExecEngine::nethub_poll *instr)
-{
-
-}
-
 void JSExecEngine::get_project_input(QString js, nethub_poll *instr)
 {
     instr->queryType = getJSInput;
@@ -388,5 +384,6 @@ void JSExecEngine::locationUpdate(const QGeoPositionInfo &info, nethub_poll *ins
 {
     inst->locCoord = new QGeoCoordinate(info.coordinate());
     inst->permFlags &= ~(LOC_PERM);
+    logger << "New Permission Var:" += QString::number(inst->permFlags);
     prep_permissions(inst);
 }

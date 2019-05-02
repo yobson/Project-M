@@ -22,6 +22,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    bool event(QEvent*);
 
 private slots:
     void on_james_test_btn_clicked();
@@ -37,8 +38,6 @@ private slots:
     void on_proj_list_view_dis_clicked(const QModelIndex &index);
 
     void on_proj_list_view_en_clicked(const QModelIndex &index);
-
-    void on_proj_list_view_dis_pressed(const QModelIndex &index);
 
 private:
     Ui::MainWindow *ui;
@@ -56,6 +55,7 @@ private:
     QStringList *project_name_list_dis = nullptr;
 
     JSExecEngine *engine;
+    bool loaded = false;
 
 };
 

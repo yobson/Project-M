@@ -18,6 +18,9 @@ public:
     explicit ProjectWindow(Project *project = nullptr, QWidget *parent = nullptr);
     ~ProjectWindow();
 
+signals:
+    void enabled_change();
+
 private slots:
     void on_enabled_check_box_stateChanged(int arg1);
 

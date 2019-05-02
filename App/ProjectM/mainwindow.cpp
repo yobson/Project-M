@@ -6,8 +6,6 @@
 
 QLinkedList<JSExecEngine::Project> sampleProjects() {
     QLinkedList<JSExecEngine::Project> ps;
-    ps.append({"ExampleA", "The first example", ""});
-    ps.append({"ExampleB", "The second example", ""});
     return ps;
 }
 
@@ -24,6 +22,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // on_get_projects(sampleProjects());
     engine->get_score();
+}
+
+bool MainWindow::event(QEvent* e)
+{
+    if(e->type() == QEvent::WindowActivate)
+        if (loaded) on_refresh_btn_clicked();
+    return QMainWindow::event(e);
 }
 
 MainWindow::~MainWindow()
@@ -112,12 +117,14 @@ void MainWindow::on_get_projects(QLinkedList<JSExecEngine::Project> ps)
     // Glue models and view together
     ui->proj_list_view_en->setModel(project_list_model_en);
     ui->proj_list_view_dis->setModel(project_list_model_dis);
+    loaded= true;
 }
 
 
 void MainWindow::on_project_list_view_en_clicked(const QModelIndex &index)
 {
     projectWindow = new ProjectWindow(&(*project_list_en)[index.row()], this);
+    connect(projectWindow, &ProjectWindow::enabled_change, this, [](){qDebug() << "CLIKED";});
     qDebug() << "Clicked on enabled project";
     projectWindow->show();
 
@@ -126,6 +133,7 @@ void MainWindow::on_project_list_view_en_clicked(const QModelIndex &index)
 void MainWindow::on_project_list_view_dis_clicked(const QModelIndex &index)
 {
     projectWindow = new ProjectWindow(&(*project_list_dis)[index.row()], this);
+    connect(projectWindow, &ProjectWindow::enabled_change, this, [this](){this->on_refresh_btn_clicked();});
     qDebug() << "Clicked on disbaled project";
     projectWindow->show();
 
@@ -133,6 +141,7 @@ void MainWindow::on_project_list_view_dis_clicked(const QModelIndex &index)
 
 void MainWindow::on_refresh_btn_clicked()
 {
+   qDebug() << "REFRESHING";
    project_list_en->clear();
    project_list_dis->clear();
    project_name_list_en->clear();
@@ -154,11 +163,4 @@ void MainWindow::on_proj_list_view_en_clicked(const QModelIndex &index)
     projectWindow = new ProjectWindow(&(*project_list_en)[index.row()], this);
     qDebug() << "Clicked on enabled project";
     projectWindow->show();
-}
-
-
-//qt expects this to be here and cant work out how to make it not expect it :(
-void MainWindow::on_proj_list_view_dis_pressed(const QModelIndex &index)
-{
-
 }
