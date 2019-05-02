@@ -22,11 +22,13 @@ JSExecEngine::JSExecEngine(QString _baseURL, QString _projExt, QObject *parent, 
     logger << "Project URL: " += projURL;
 
     netHub = new QNetworkAccessManager(this);
+    locationSource = QGeoPositionInfoSource::createDefaultSource(this);
 }
 
 JSExecEngine::~JSExecEngine()
 {
     netHub->deleteLater();
+    if (locationSource != nullptr) locationSource->deleteLater();
 }
 
 void JSExecEngine::exists_user(QString userID)
@@ -76,13 +78,13 @@ void JSExecEngine::run_project()
         return;
     }
     nethub_poll *instr = new nethub_poll();
-    instr->queryType = getJS;
-    instr->returnSignal = jsReady;
+    instr->queryType = getPermissions;
+    instr->returnSignal = prepPermissions;
     instr->userID = new QString(getUserID());
     buildRequest(instr);
     QNetworkReply *reply = netHub->get(*instr->request);
     connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
-    logger << QString("Requested js ") + instr->request->url().toString();
+    logger << QString("Requested permissions ") + instr->request->url().toString();
 }
 
 void JSExecEngine::get_score()
@@ -96,6 +98,38 @@ void JSExecEngine::get_score()
     QNetworkReply *reply = netHub->get(*instr->request);
     connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
     logger << QString("Started score check ") + instr->request->url().toString();
+}
+
+void JSExecEngine::get_permissions()
+{
+    QString userID = getUserID();
+    nethub_poll *instr = new nethub_poll();
+    instr->queryType = getPermissions;
+    instr->userID = new QString(userID);
+    instr->returnSignal = retPermissions;
+    buildRequest(instr);
+    QNetworkReply *reply = netHub->get(*instr->request);
+    connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
+    logger << QString("Started permissions check ") + instr->request->url().toString();
+}
+
+void JSExecEngine::prep_permissions(JSExecEngine::nethub_poll *instr)
+{
+    if (instr->permFlags != 0) {
+        if (instr->permFlags && LOC_PERM) {
+            locationSource->requestUpdate();
+            connect(locationSource, &QGeoPositionInfoSource::positionUpdated, this, [this, instr](const QGeoPositionInfo& g){this->locationUpdate(g,instr);});
+        }
+        return;
+    }
+
+    instr->queryType = getJS;
+    instr->returnSignal = jsReady;
+    instr->userID = new QString(getUserID());
+    buildRequest(instr);
+    QNetworkReply *reply = netHub->get(*instr->request);
+    connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
+    logger << QString("Requested js ") + instr->request->url().toString();
 }
 
 bool JSExecEngine::standardEnd(QString *check)
@@ -139,6 +173,15 @@ void JSExecEngine::buildRequest(JSExecEngine::nethub_poll *inst)
             QUrl url(baseURL);
             QUrlQuery query;
             query.addQueryItem("action","GetTasks");
+            url.setQuery(query);
+            if (inst->request != nullptr) delete inst->request;
+            inst->request = new QNetworkRequest(url);
+            break;
+        }
+        case getPermissions : {
+            QUrl url(baseURL);
+            QUrlQuery query;
+            query.addQueryItem("action","RequestPermissions");
             url.setQuery(query);
             if (inst->request != nullptr) delete inst->request;
             inst->request = new QNetworkRequest(url);
@@ -218,6 +261,17 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
             deleteNethubPoll(instr);
             break;
         }
+        case retPermissions : {
+            if (data.startsWith("{}")) {
+                return;
+            }
+            QString ret = QString::fromUtf8(data).toUtf8();
+            QStringList perms = ret.split(':');
+            if(perms.contains("Location")) instr->permFlags |= LOC_PERM;
+            emit get_permissions_result(perms);
+            deleteNethubPoll(instr);
+            break;
+        }
         case retProjs : {
             QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(data).toUtf8());
             QJsonObject projectObj;
@@ -256,6 +310,16 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
             return_answer(ret.toString(), instr);
             break;
         }
+        case prepPermissions : {
+            if (data.startsWith("{}")) {
+                return;
+            }
+            QString ret = QString::fromUtf8(data).toUtf8();
+            QStringList perms = ret.split(':');
+            if(perms.contains("Location")) instr->permFlags |= LOC_PERM;
+            prep_permissions(instr);
+            break;
+            }
         case noSignal   : deleteNethubPoll(instr); return;
         }
     }
@@ -272,6 +336,7 @@ void JSExecEngine::deleteNethubPoll(JSExecEngine::nethub_poll *poll)
     if (poll->request != nullptr) delete poll->request;
     if (poll->userID != nullptr) delete poll->userID;
     if (poll->data.js != nullptr) delete poll->data.js;
+    if (poll->locCoord != nullptr) delete poll->locCoord;
     delete poll;
 }
 
@@ -289,6 +354,11 @@ QString JSExecEngine::getUserID()
         return id;
     }
     return "";
+}
+
+void JSExecEngine::getRequestedPhoneData(JSExecEngine::nethub_poll *instr)
+{
+
 }
 
 void JSExecEngine::get_project_input(QString js, nethub_poll *instr)
@@ -312,4 +382,11 @@ void JSExecEngine::return_answer(QString result, JSExecEngine::nethub_poll *inst
     QNetworkReply *reply = netHub->get(*instr->request);
     connect(reply, &QNetworkReply::finished, this, [reply,instr,this](){this->parseReturn(reply, instr);});
     logger << QString("Returning Answer ") + instr->request->url().toString();
+}
+
+void JSExecEngine::locationUpdate(const QGeoPositionInfo &info, nethub_poll *inst)
+{
+    inst->locCoord = new QGeoCoordinate(info.coordinate());
+    inst->permFlags &= ~(LOC_PERM);
+    prep_permissions(inst);
 }

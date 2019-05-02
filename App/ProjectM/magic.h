@@ -11,5 +11,8 @@
 #define ALL_PROJECTS_DIR "allProjects"
 #define LAST_RUN_DIR "lastRun"
 
+//Flags
+#define LOC_PERM 1 << 0
+
 
 #endif // MAGIC_H

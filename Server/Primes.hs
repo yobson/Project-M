@@ -27,5 +27,6 @@ updater state@(lg,ch,id)  RequestInput   = ((lg,nextOdd lg ch ,id), Send $ show 
 updater state@(lg,ch,id) (ReturnAns n i) | i > lg    = ((i,ch,n), Yeet)
                                          | otherwise = (state, Yeet) 
 updater state@(lg,ch,id)  ShowProject    = (state, Send $ genPage lg id)
+updater state             RequestPermissions = (state, formatPermissions [])
 
 main = runSite "primes" updater (2,2,1000)

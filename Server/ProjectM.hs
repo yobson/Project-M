@@ -6,6 +6,8 @@ module ProjectM (
       Event (..),
       runSite,
       Result (..),
+      Permissions (..),
+      formatPermissions,
       Updater
 ) where
 
@@ -23,8 +25,9 @@ import Control.DeepSeq
 m |>>=| f = fmap (>>= f) m
 infixl 1 |>>=|
 
-data Event a = RequestJS | RequestInput | ReturnAns Int a | ShowProject deriving (Read, Show)
+data Event a = RequestJS | RequestPermissions | RequestInput | ReturnAns Int a | ShowProject deriving (Read, Show)
 data Result = Send String | Yeet
+data Permissions = Location deriving (Read, Show)
 data User = User Integer String String Integer deriving (Read, Show)
 
 instance Show Result where
@@ -34,6 +37,9 @@ instance Show Result where
 type Input = (String, String)
 type Updater a b = a -> Event b -> (a, Result)
 type DBName = String
+
+formatPermissions :: [Permissions] -> Result
+formatPermissions = Send . foldr1 (\p ps -> concat [p,":",ps]) . map show 
 
 findInput :: [Input] -> String -> Maybe String
 findInput xs s = (safeHead $ filter (\(a,_) -> a == s) xs) >>= return . snd
