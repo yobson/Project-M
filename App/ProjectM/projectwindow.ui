@@ -131,7 +131,7 @@
       <item row="4" column="1">
        <widget class="QCheckBox" name="wifi_check_box">
         <property name="text">
-         <string>wifi only</string>
+         <string>WiFi only</string>
         </property>
        </widget>
       </item>
