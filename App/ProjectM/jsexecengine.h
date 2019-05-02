@@ -63,7 +63,7 @@ private:
         QNetworkRequest *request = nullptr;
         QString *userID = nullptr;
         nethub_poll_data data;
-        int32_t permFlags;
+        int32_t permFlags = 0;
         QGeoCoordinate *locCoord = nullptr;
     } nethub_poll;
     QString baseURL; //URL of user managment server
