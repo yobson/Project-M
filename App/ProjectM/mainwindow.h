@@ -26,6 +26,7 @@ public:
 private slots:
     void on_james_test_btn_clicked();
     void on_get_projects(QLinkedList<JSExecEngine::Project> p);
+    void on_get_score(int score);
     void on_refresh_btn_clicked();
 
     void on_project_list_view_en_clicked(const QModelIndex &index);

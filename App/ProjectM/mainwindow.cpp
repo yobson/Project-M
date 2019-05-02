@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     engine = new JSExecEngine(PROJECT_BASE_IP);
     connect(engine, &JSExecEngine::get_projects_result, this, &MainWindow::on_get_projects);
+    connect(engine, &JSExecEngine::get_score_result, this, &MainWindow::on_get_score);
     engine->get_projects();
 
     // on_get_projects(sampleProjects());
@@ -45,6 +46,11 @@ void MainWindow::on_james_test_btn_clicked()
 {
     tp = new TestPage(this);
     tp->show();
+}
+
+void MainWindow::on_get_score(int score)
+{
+    ui->user_score->setText(QString::number(score));
 }
 
 void MainWindow::on_get_projects(QLinkedList<JSExecEngine::Project> ps)
