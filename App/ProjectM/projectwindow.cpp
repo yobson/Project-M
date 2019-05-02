@@ -8,6 +8,8 @@
 #include <QDebug>
 #include <vector>
 #include <algorithm>
+#include <QMessageBox>
+#import "magic.h"
 
 
 ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
@@ -18,6 +20,9 @@ ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
     ui->setupUi(this);
     setWindowState((windowState() & ~(Qt::WindowMinimized | Qt::WindowFullScreen))
                        | Qt::WindowMaximized);
+    engine = new JSExecEngine(PROJECT_BASE_IP, project->url());
+    qDebug() << project->url();
+    connect(engine, &JSExecEngine::get_permissions_result, this, &ProjectWindow::get_permissions);
 
     ui->project_name->setText(project->name());
     ui->project_desc->setText(project->full_desc());
@@ -44,27 +49,29 @@ ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :
     ui->freq_slider->setValue(sliderFromSeconds(freq));
     ui->freq_text->setText(freq_text(sliderFromSeconds(freq)));
 
+    uiLoaded = true;
 }
 
 ProjectWindow::~ProjectWindow()
 {
     /// TODO: update project settings;
     qDebug() << "exiting projectwindow";
+    if (engine != nullptr) delete engine;
     delete ui;
 }
 
 void ProjectWindow::on_enabled_check_box_stateChanged(int arg1)
 {
-	
-    this->project->enabled() = arg1;
-    QSettings settings(COMPANY_NAME, APP_NAME);
-    settings.beginGroup(ALL_PROJECTS_DIR);
-    settings.beginGroup(this->project->name());
-
-    settings.setValue(ProjectSettings::ENABLED, this->project->enabled());
-    settings.sync();
-    emit enabled_change();
-
+    if (!uiLoaded) {
+        actually_enable(arg1);
+        return;
+    }
+    if (arg1 == Qt::Unchecked) enable(arg1);
+    else {
+        engine->get_permissions();
+        arg = arg1;
+        connect(this, &ProjectWindow::actually_enable, this, &ProjectWindow::enable);
+    }
 }
 
 
@@ -108,6 +115,42 @@ void ProjectWindow::on_freq_slider_valueChanged(int value)
     settings.setValue(ProjectSettings::FREQUENCY, this->project->frequency());
     settings.sync();
 
+}
+
+void ProjectWindow::get_permissions(QStringList perms)
+{
+    qDebug() << "Checking perms";
+    if (perms.empty()) emit actually_enable(arg);
+    else {
+        QMessageBox warning;
+        warning.setText("This project requires permissions!");
+        QString permsFlat;
+        Q_FOREACH(QString s, perms) {
+            permsFlat += s + " ";
+        }
+        warning.setInformativeText("PERMISSIONS REQUIRED: " + permsFlat);
+        warning.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        warning.setDefaultButton(QMessageBox::No);
+        int ret = warning.exec();
+        if (ret == QMessageBox::Yes)
+            emit actually_enable(Qt::Checked);
+        else emit actually_enable(Qt::Unchecked);
+    }
+}
+
+void ProjectWindow::enable(int arg1)
+{
+    this->project->enabled() = arg1;
+    uiLoaded = false;
+    ui->enabled_check_box->setCheckState(arg1 ? Qt::Checked : Qt::Unchecked);
+    uiLoaded = true;
+    QSettings settings(COMPANY_NAME, APP_NAME);
+    settings.beginGroup(ALL_PROJECTS_DIR);
+    settings.beginGroup(this->project->name());
+
+    settings.setValue(ProjectSettings::ENABLED, this->project->enabled());
+    settings.sync();
+    disconnect(this,&ProjectWindow::actually_enable, this, &ProjectWindow::enable);
 }
 
 int ProjectWindow::sliderToSeconds(int slid)

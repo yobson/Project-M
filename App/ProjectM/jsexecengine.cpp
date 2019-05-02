@@ -119,7 +119,7 @@ void JSExecEngine::prep_permissions(JSExecEngine::nethub_poll *instr)
     if (instr->permFlags & LOC_PERM) {
         if (!locationRunning) { locationSource->startUpdates(); locationRunning = true;}
     } else {
-        if (locationRunning) { locationSource->stopUpdates(); locationRunning = false;}
+        locationSource->stopUpdates(); locationRunning = false;
     }
 
     instr->queryType = getJS;
