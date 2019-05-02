@@ -90,12 +90,14 @@ class Coordinate : public QObject
     Q_OBJECT
 public:
     explicit Coordinate(QGeoCoordinate *coord, QObject *parent = nullptr);
-    double lati();
-    double longi();
-    double distance(double lat, double longi);
+    Q_PROPERTY(QString lati MEMBER m_lati)
+    Q_PROPERTY(QString longi MEMBER m_longi)
+    Q_PROPERTY(QString distance MEMBER m_distance)
 
 private:
-    QGeoCoordinate *coord = nullptr;
+    QString m_lati;
+    QString m_longi;
+    QString m_distance;
 };
 
 #endif // JSEXECENGINE_H

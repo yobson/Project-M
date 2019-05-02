@@ -12,7 +12,7 @@
 #define LAST_RUN_DIR "lastRun"
 
 //Flags
-#define LOC_PERM 1 << 0
+#define LOC_PERM 1
 
 
 #endif // MAGIC_H
