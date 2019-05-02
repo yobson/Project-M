@@ -85,4 +85,17 @@ private:
     Logger logger;
 };
 
+class Coordinate : public QObject
+{
+    Q_OBJECT
+public:
+    explicit Coordinate(QGeoCoordinate *coord, QObject *parent = nullptr);
+    double lati();
+    double longi();
+    double distance(double lat, double longi);
+
+private:
+    QGeoCoordinate *coord = nullptr;
+};
+
 #endif // JSEXECENGINE_H

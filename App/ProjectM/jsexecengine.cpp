@@ -302,12 +302,19 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
             QString in = QString::fromUtf8(data);
             logger << "Got JS" += in;
             QJSEngine engine;
+            QJSValue loc; Coordinate *coord = nullptr;
+            if (instr->locCoord != nullptr) {
+                coord = new Coordinate(instr->locCoord);
+                loc = engine.newQObject(coord);
+                engine.globalObject().setProperty("m_location", loc);
+            }
             QJSValue fun = engine.evaluate(*instr->data.js);
             QJSValueList args;
             args << *instr->userID << in;
             QJSValue ret = fun.call(args);
             logger << "Calculated answer:" += ret.toString();
             return_answer(ret.toString(), instr);
+            if (coord == nullptr) delete coord;
             break;
         }
         case prepPermissions : {
@@ -386,4 +393,24 @@ void JSExecEngine::locationUpdate(const QGeoPositionInfo &info, nethub_poll *ins
     inst->permFlags &= ~(LOC_PERM);
     logger << "New Permission Var:" += QString::number(inst->permFlags);
     prep_permissions(inst);
+}
+
+Coordinate::Coordinate(QGeoCoordinate *cord, QObject *parent) : QObject (parent)
+{
+    coord = cord;
+}
+
+double Coordinate::lati()
+{
+    return coord->latitude();
+}
+
+double Coordinate::longi()
+{
+    return coord->longitude();
+}
+
+double Coordinate::distance(double lat, double longi)
+{
+    return coord->distanceTo(QGeoCoordinate(lat, longi));
 }
