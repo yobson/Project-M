@@ -64,12 +64,12 @@ private:
         QString *userID = nullptr;
         nethub_poll_data data;
         int32_t permFlags = 0;
-        QGeoCoordinate *locCoord = nullptr;
     } nethub_poll;
     QString baseURL; //URL of user managment server
     QString projURL; //URL of project CGI.
     QNetworkAccessManager *netHub;
     QGeoPositionInfoSource *locationSource = nullptr;
+    bool locationRunning;
 
     bool standardEnd(QString *check);
     bool standardStart(QString *check);
@@ -80,7 +80,6 @@ private:
     void getRequestedPhoneData(nethub_poll *instr);
     void get_project_input(QString js, nethub_poll *instr);
     void return_answer(QString result, nethub_poll *instr);
-    void locationUpdate(const QGeoPositionInfo &info, nethub_poll *inst);
     void prep_permissions(nethub_poll *instr);
     Logger logger;
 };
@@ -89,7 +88,7 @@ class Coordinate : public QObject
 {
     Q_OBJECT
 public:
-    explicit Coordinate(QGeoCoordinate *coord, QObject *parent = nullptr);
+    explicit Coordinate(QGeoCoordinate coord, QObject *parent = nullptr);
     Q_PROPERTY(QString lati MEMBER m_lati)
     Q_PROPERTY(QString longi MEMBER m_longi)
     Q_PROPERTY(QString distance MEMBER m_distance)
