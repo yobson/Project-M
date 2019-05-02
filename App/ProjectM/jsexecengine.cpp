@@ -23,6 +23,7 @@ JSExecEngine::JSExecEngine(QString _baseURL, QString _projExt, QObject *parent, 
 
     netHub = new QNetworkAccessManager(this);
     locationSource = QGeoPositionInfoSource::createDefaultSource(this);
+    locationRunning = false;
 }
 
 JSExecEngine::~JSExecEngine()
@@ -115,13 +116,10 @@ void JSExecEngine::get_permissions()
 
 void JSExecEngine::prep_permissions(JSExecEngine::nethub_poll *instr)
 {
-    if (instr->permFlags != 0) {
-        if (instr->permFlags & LOC_PERM) {
-            locationSource->requestUpdate(9000);
-            connect(locationSource, &QGeoPositionInfoSource::positionUpdated, this, [this, instr](const QGeoPositionInfo& g){this->locationUpdate(g,instr);});
-            logger << "Requested GPS update";
-        }
-        return;
+    if (instr->permFlags & LOC_PERM) {
+        if (!locationRunning) { locationSource->startUpdates(); locationRunning = true;}
+    } else {
+        if (locationRunning) { locationSource->stopUpdates(); locationRunning = false;}
     }
 
     instr->queryType = getJS;
@@ -304,9 +302,9 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
             logger << "Got JS" += in;
             QJSEngine engine;
             QJSValue loc; Coordinate *coord = nullptr;
-            if (instr->locCoord != nullptr) {
+            if (locationRunning) {
                 logger << "Enabling location for:" += baseURL;
-                coord = new Coordinate(instr->locCoord);
+                coord = new Coordinate(locationSource->lastKnownPosition().coordinate());
                 loc = engine.newQObject(coord);
                 engine.globalObject().setProperty("m_location", loc);
             }
@@ -347,7 +345,6 @@ void JSExecEngine::deleteNethubPoll(JSExecEngine::nethub_poll *poll)
     if (poll->request != nullptr) delete poll->request;
     if (poll->userID != nullptr) delete poll->userID;
     if (poll->data.js != nullptr) delete poll->data.js;
-    if (poll->locCoord != nullptr) delete poll->locCoord;
     delete poll;
 }
 
@@ -390,18 +387,11 @@ void JSExecEngine::return_answer(QString result, JSExecEngine::nethub_poll *inst
     logger << QString("Returning Answer ") + instr->request->url().toString();
 }
 
-void JSExecEngine::locationUpdate(const QGeoPositionInfo &info, nethub_poll *inst)
+Coordinate::Coordinate(QGeoCoordinate cord, QObject *parent) : QObject (parent)
 {
-    inst->locCoord = new QGeoCoordinate(info.coordinate());
-    inst->permFlags &= ~(LOC_PERM);
-    logger << "New Permission Var:" += QString::number(inst->permFlags);
-    prep_permissions(inst);
-}
-
-Coordinate::Coordinate(QGeoCoordinate *cord, QObject *parent) : QObject (parent)
-{
-    m_lati     = QString::number(cord->latitude());
-    m_longi    = QString::number(cord->longitude());
-    m_distance = QString::number(cord->distanceTo(QGeoCoordinate(51.759688, -1.258226)));
+    m_lati     = QString::number(cord.latitude());
+    m_longi    = QString::number(cord.longitude());
+    m_distance = QString::number(cord.distanceTo(QGeoCoordinate(51.759833, -1.258470)));
+    qDebug() << "Lat: " << m_lati << " long: " << m_longi << " dist: " << m_distance;
 }
 
