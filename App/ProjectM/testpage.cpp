@@ -61,7 +61,7 @@ void TestPage::ranTest(QString in, QString ret)
    return;
 passed:
    done++;
-   if (done >= 100) {
+   if (done >= 1000) {
        done = 0;
        logger.htmlText("\nPassed!");
        return;
