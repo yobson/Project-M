@@ -314,6 +314,7 @@ void JSExecEngine::parseReturn(QNetworkReply *reply, nethub_poll *instr)
             QJSValue ret = fun.call(args);
             logger << "Calculated answer:" += ret.toString();
             return_answer(ret.toString(), instr);
+            emit finished_project_exec(in, ret.toString());
             if (coord == nullptr) delete coord;
             break;
         }

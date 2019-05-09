@@ -39,7 +39,8 @@ type Updater a b = a -> Event b -> (a, Result)
 type DBName = String
 
 formatPermissions :: [Permissions] -> Result
-formatPermissions = Send . foldr1 (\p ps -> concat [p,":",ps]) . map show 
+formatPermissions [] = Send ""
+formatPermissions xs = (Send . foldr1 (\p ps -> concat [p,":",ps]) . map show) xs
 
 findInput :: [Input] -> String -> Maybe String
 findInput xs s = (safeHead $ filter (\(a,_) -> a == s) xs) >>= return . snd

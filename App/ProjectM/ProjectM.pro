@@ -33,7 +33,6 @@ SOURCES += \
     loginwindow.cpp \
     testpage.cpp \
     logger.cpp \
-    service.cpp \
     projectwindow.cpp \
     project.cpp
 
@@ -45,7 +44,6 @@ HEADERS += \
     magic.h \
     testpage.h \
     logger.h \
-    service.h \
     projectwindow.h \
     project.h \
     projectsettings.h
@@ -80,4 +78,11 @@ DISTFILES += \
 android: {
     QT += androidextras
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+    HEADERS += \
+        service.h
+
+    SOURCES += \
+        service.cpp
 }
+
+ios: {}

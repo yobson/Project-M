@@ -29,12 +29,20 @@ private slots:
     void on_get_projects_btn_clicked();
     void on_run_prime_btn_clicked();
     void gotProjects(QLinkedList<JSExecEngine::Project> p);
+    void ranTest(QString in, QString ret);
 
+
+    void on_test_btn_clicked();
 
 private:
     Ui::TestPage *ui;
     Logger logger;
     JSExecEngine *engine = nullptr;
+    JSExecEngine *testEngine = nullptr;
+
+    bool isPrime(int i);
+
+    int done = 0;
 };
 
 #endif // TESTPAGE_H

@@ -5,8 +5,10 @@
 #include <QTimer>
 #include <QDebug>
 #include <QTime>
+#ifdef Q_OS_ANDROID
 #include <QAndroidJniObject>
 #include <QtAndroid>
+#endif
 #include <QSettings>
 #include <QHash>
 

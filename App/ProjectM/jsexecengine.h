@@ -35,6 +35,7 @@ public:
         QString description;
         QString URL;
     } Project;
+    Logger logger;
 
 signals:
     void exists_user_result(bool);
@@ -43,6 +44,7 @@ signals:
     void get_projects_result(QLinkedList<Project>);
     void web_error(QNetworkReply::NetworkError);
     void get_permissions_result(QStringList permissionList);
+    void finished_project_exec(QString in, QString res);
 
 private:
     enum query_type {getUser, regUser, noQuery, getProjs, getJS, getJSInput, returnJS, getPermissions};
@@ -81,7 +83,6 @@ private:
     void get_project_input(QString js, nethub_poll *instr);
     void return_answer(QString result, nethub_poll *instr);
     void prep_permissions(nethub_poll *instr);
-    Logger logger;
 };
 
 class Coordinate : public QObject
