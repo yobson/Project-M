@@ -349,17 +349,51 @@ when the user accepts the permissions. This is low level enforcement of the perm
 
 \subsubsection{Graphical User Interface}
 \subsection{Testing}
+Testing the application was hard given that the specification of each project is up to the creator of the project itself. Having said this,
+we have done our best to test our app in a few ways. The first way is by using the app. We have been running the app for (as of writing)
+4 weeks. 5 phones minimum have been participating in the Primes project alone and have each been running projects every 30 seconds.
+This works out to be almost 100,000,000 exchanges between the mobile app and the server, most of which have been simultaneous. The results
+of both test projects have been monitored extensively and there has never been an incorrect result.
+
+Be we realise that waiting for a bug is not the way to go so have also created a test suit. Launching the app with certain command line
+arguments will open onto a page which connects to a different, local, test server and runs stress and accuracy tests in quick succession.
+If you want to try this out for yourself, head to the \texttt{tests} branch.
+
+Each part of the UI has been tested by users trying to break it and the service has been tested extensively to make sure that if the user
+changes any predicate or changes whether a project is enabled or disabled, the background service will respect the users requests immediately.
+
+\section{Current State of the Project and Possible Future Improvements}
+The app is fully functional on android and partially functional on other platforms. The app is built using the Qt framework meaning that
+the UI and backend are fully functional on almost all platforms (Windows, Linux, Mac OS, Android, iOS, Blackberry OS, etc.) but
+Qt offers no help in developing the background service and this is radically different on every platform. We have only concerned ourselves
+with android as it is a platform that we all have access to. Having said that, we have tested all other parts of the app on
+Mac OS, Linux and iOS.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{DocFiles/tests}
+  \caption{Automated backend tests running on both Android and iOS}
+\end{figure}
+If we had more time to develop this project, we would achieve done the following:
+\begin{enumerate}
+  \item{Remade the UI in QML to achieve a far more user friendly experience while still remaining cross platform}
+  \item{Write cross platform service code, although this seems impossible, projects such as GNUstep compile to Mac OS and iOS natively (using Cocoa),
+    Windows, Linux and BSD platforms. This would cover all non-mobile targets + iOS}
+  \item{Add more sensors and corresponding permissions}
+  \item{Write more unit test frameworks for the application}
+  \item{Research more how we could incentives people to adopt it}
+\end{enumerate}
+
 \section{Responsible innovation}
 The system we have created has a range of ethical implications and societal effects that must be considered. We shall also outline possible
 security issues and how we have attempted to mittigate them.
 \subsection{Ethical Implications}
 We should consider what projects we allow users to contribute to through our app. It may be unethical for us to, for example, allow our
-users to work on projects that directly contribute to the manufacture, distribution, or use of on ethical products such as arms or tobacco.
+users to work on projects that directly contribute to the manufacture, distribution, or use of unethical products such as arms or tobacco.
 We must also ensure that users are fully aware of what a particular project is working towards. We should not allow a situation where a project
 may seem harmless (given a very limited description) but is really part of a wider project which users may not necessarily want to contribute to.
 Furthermore, a project that we allow users to contribute to may be completely benign, but if it is being carried out by a company that employs
 unethical practices elsewhere in its business, then we must consider whether we wish to support them by allowing their project on our platform.
-This is linked to §4.2.
+This is linked to §5.2.
 However, if we decide that we can determine what projects we offer and ban ones we disagree with from our service, one might consider this to mean
 that we actively support all projects we are offering and oppose all projects that we remove. This could lead to further issues if we have the
 option of hosting or banning projects linked to controversial issues.
@@ -371,7 +405,10 @@ does carry out exactly what the user is expecting it to. For example, a software
 when it appears to be disabled to the user, and this would be a breach of trust, particularly if the user’s phone is mistakenly contributing
 to a project that they do not want to support.
 
-We have attempted to mitigate some of these issues by building a low level permissions system (more on this in §4.3) meaning that a user can
+An example of a project that is aimed to highlight possible issues with user permission misuse can be found at 
+\texttt{http://www.hobson.space/cgi-bin/Explorer.cgi?event=ShowProject}
+
+We have attempted to mitigate some of these issues by building a low level permissions system (more on this in §5.3) meaning that a user can
 know exactly what is required from the phone in terms of sensor data. Projects have to be hosted on the same computer as the main server
 allowing us to decide which projects can and cannot be run on phones. Although this still suffers from the endorsement issue highlighted in
 the second paragraph, we could allow all projects that fit our ethical code and explicitly state that we endorse none of them.
@@ -379,8 +416,8 @@ the second paragraph, we could allow all projects that fit our ethical code and 
 \subsection{Social Effects}
 We hope that, if our platform were to be released and widely used, that it could bring awareness and computational resources to many positive
 projects and causes. We would be proud to have our platform support any project that aims to make a positive impact in the world, and to have
-a userbase that wishes to make a contribution in the form of donating their phones’ spare processing power. However, as mentioned in section
-4.1, we must be careful that our platform does not host or support projects that may serve a negative or harmful purpose, whether directly or
+a userbase that wishes to make a contribution in the form of donating their phones’ spare processing power. However, as mentioned in
+§5.1, we must be careful that our platform does not host or support projects that may serve a negative or harmful purpose, whether directly or
 indirectly.
 
 Whether our project could be used to bring about positive change is dependent upon what projects become available, but examples of projects
