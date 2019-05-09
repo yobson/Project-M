@@ -13,13 +13,13 @@
 
 \setmonofont{Fira Code}
 \setminted{autogobble}
+\usemintedstyle{tango}
 
-\title{Project M - Report}
+\title{Project M -- Report}
 \author{Adam Nicholls, George Chichirim, James Hobson, \\ Mihail Denkovski and Minh Le Quoc}
 
 \begin{document}
 \maketitle
-We shall start by quoting our project brief as given to us.
 \begin{quote}
   \textbf{Project M: Put your phone to work}
 
@@ -205,18 +205,239 @@ every platform. On top of this, with the knowledge that this app was to be runni
 ensure a little memory and CPU was used as possible, this gives C++ a major advantage over any other cross-platform options as they are almost always
 predicated non-native frameworks such as web-technologies or the .net framework.
 \section{Detailed Descriptions}
+In this section, we shall go into far more detail about how Project M was implemented and tested. We will refer back to the project structure in
+many places and so it is suggested that you read that first.
 \subsection{Server}
-\subsubsection{User Management}
-\subsubsection{Project Managment and Hosting}
+The server is comprised of a user management and project hosting \texttt{CGI} executable and a library that creates project \texttt{CGI} executables.
+In order to understand how both work we will need to be fluent in Haskell and know what redis is. Haskell was used for two reasons. The first is that
+it is very type safe and has no mutable state making our server code far less prone to errors. The next reason is we wanted the projects to be
+programed in Haskell for the same reason! The two sections (described blow) are in no way linked (other than they share a redis server) and so
+could have been programmed in two different languages, but it seemed far more readbale to keep all server code in one language.
+
+\subsubsection{User Management and Project Hosting}
+The code is found in \texttt{\$PROJECT\_ROOT/Server/main.hs}. Haskell seems like an interesting choice of language for web programming as
+the web is aggressively untyped and haskell is aggressively typed, but this was really the reason I decided to use it. All malformed input
+must be rejected and all input must be dealt with accurately because this project has the potential to be used in scientific computing!
+But for this reason, much of my code involves types of the form \mintinline{haskell}{IO (Maybe a)}. I decided not to use monad transformers
+because they seemed not quite up to the job, to instead I defined a nested monadic bind:
+\begin{minted}{haskell}
+  (|>>=|) :: (Monad m1, Monad m2) => m1 (m2 a) -> (a -> m2 b) -> m1 (m2 b)
+  m |>>=| f = fmap (>>= f) m
+  infixl 1 |>>=|
+\end{minted}
+Understanding this code (or at least what it does) will be really useful in Understanding both how the code (and the ProjectM library) work as well as
+the policy on malformed input. In essence, it applies monadic bind \textit{within} another monad.
+
+Now we can get onto the two functions of this program. The first is project management. I will not go into much detail about what that means,
+for that, read §1.3. The \texttt{getProjects} function is responsible for parsing was is in the configuration file and building
+the haskell types. It has to use the strict IO functions in order to guarantee that the file descriptor isn't closed before it has been read.
+This would be a problem because we pull the file into a data structure but then close the file and pass that onto another function. Because
+haskell is never forced to evaluate the data structure, it never bothers to build it and thus when it is eventually used by \texttt{act},
+haskell tries to read the file but it is now closed! This is my justification for the non-standard library usage.
+
+All user function are not concerned with the file system but with the database. The data was chosen to be redis because we really 
+valued speed over much else. The library used to interface with redis is `hedis'. Each user function simply runs an hedis query from within the
+redis monad, this is then given to us in an \mintinline{haskell}{RedisCtx m f => m (f (Maybe a))} type which take a little refinement to get
+back into our preferred \mintinline{haskell}{IO (Maybe a)} type.
+
+Finally, when sending data back to the phone, the standard we decided to use is \texttt{JSON}. For this reason, the type class \texttt{JSON}
+has been defined and for every type that is serialised and sent to the phone, there is an instance of the function \texttt{jsonify}.
+
+\subsubsection{ProjectM Library}
+The ProjectM library is a library that must be used to create a project that can run on our platform and the code is found at
+\texttt{\$PROJECT\_ROOT/Server/ProjectM.hs}. If you have looked at the code (or the code of \texttt{main.hs}) you may have noticed
+how much of a mess of monads it is. The idea is that we have messed around with monads so that you, the client, don't have to.
+
+The Library builds \texttt{CGI} programs, not \texttt{FCGI} because we wanted the programs to be easily hot swappable. This means
+every single web request to a project launches the program afresh; but there seems to be persistent state in the form of haskell
+data types. This is because every single call to the update functions reads the type from the database, changes it and then commits it
+back. This gives the illusion that the program is always running. But of course, what if two phone try to change the state at the same time?
+This is actually resolved by a certain data structure in redis. The linked list allows us to pop and push objects in linked lists and it blocks
+when the list is empty. This is great for us because if we have a singleton list then we can pop the haskell type, blocking all other
+processes, then push back on the modified version. This is almost all of what the library does. On top of this, it updates the user's
+score whenever they submit an answer, exposes data types needed to implement the user defined functions and provided helpers
+and types for permissions.
+
 \subsection{Mobile App}
+The app can be be split into a number of distinct parts. The Service is responcible for scheduling runs of the \texttt{JSExecEngine} and is
+configured by the GUI. These are the fundamental building blocks of the app.
+
 \subsubsection{Service}
 \subsubsection{Java Script Execution Engine}
+The Java Script execution engine (found in \texttt{jsexecengine.cpp} and \texttt{jsexecengine.h}) is a class designed to be the bridge between
+the server and the rest of the app. It's job is to deal with all server communication as well as executing the JS code on the phone.
+I will begin by describing how the object is instantiated and used. The object is instantiated with the following:
+\begin{minted}{cpp}
+  JSExecEngine *engine = new JSExecEngine(baseAddress, projectExt, parent, editor);
+\end{minted}
+The \texttt{baseAddress} is the only necessary parameter; the rest have defaults. The base address is the server address such that
+\texttt{baseAddress/bin-cgi/} is the directory with the projects and main server app in. The project extention is the name of the
+\texttt{cgi} executable (with \texttt{.cgi} extension) of the project it is concerned with (for example \texttt{Primes.cgi}).
+The parent is the \texttt{QObject} parent, although not necessary, it does mean that there is elementary garbage collection if
+it is instantiated in a tree of \texttt{QObjects}. This is more of a precaution than a necessity, a \texttt{JSExecEngine} object
+should be deleted whenever it is done with. The \texttt{editor} is another optional parameter used only in the \texttt{testpage}
+class which allows for all logs to be redirected to the screen for testing purposes.
+
+The object is then used using queries and dynamically dispached callbacks. Luckily, the dynamic callbacks are implemented as part
+of the Qt framework. The following queries are available (implemented as public functions):
+\begin{minted}{cpp}
+void exists_user(QString userID); //Check to see if user exists with certain ID
+void register_user(QString firstName, QString lastName); //Register a new user
+void get_projects(); //Get list of avalable projects to run.
+void run_project(); //run the selected project (seleced when instantiated with projectExt)
+void get_score(); //Get user's score
+void get_permissions(); //Get permissions needed by selected project
+\end{minted}
+Notice that every method returns \mintinline{cpp}{void}. This is because the class is designed to be non-blocking and asynchronous.
+the following \textit{signals} are also exposed by the class:
+\begin{minted}{cpp}
+void exists_user_result(bool);
+void get_score_result(int);
+void register_user_result(QString);
+void get_projects_result(QLinkedList<Project>);
+void web_error(QNetworkReply::NetworkError);
+void get_permissions_result(QStringList permissionList);
+\end{minted}
+These pretty much correspond to the queries defined above. The following example shows how to use the class to get the user's score:
+\begin{minted}{cpp}
+void ThisClass::some_func() {
+    JSExecEngine *engine = new JSExecEngine(PROJECT_BASE_IP);
+    connect(engine, &JSExecEngine::get_score_result, this, &ThisClass::score_slot);
+    engine->get_score();
+}
+
+void ThisClass::score_slot(int score) {
+    //do something with user score
+}
+\end{minted}
+
+The implementation of theses queries involved a bunch of methods to construct web requests. A struct of type \texttt{nethub\_poll}
+is created and filled with data depending on the type of request and response is required. \texttt{enum}s are used to specify
+the type of request (corresponding the possible requests to the server) and responses (corresponding to all possible callbacks
+both internal and external). The options are:
+\begin{minted}{cpp}
+  enum query_type {getUser, regUser, noQuery, getProjs, getJS, getJSInput, 
+                   returnJS, getPermissions};
+  enum return_signal {existsUser, userReg, noSignal, retProjs, jsReady,
+                      jsInputReady, retScore, retPermissions, prepPermissions};
+\end{minted}
+The \texttt{query\_type} is used by a function \texttt{buildRequest} to craft the corresponding GET request. The
+\texttt{return\_signal} specifies the return signal and also is used by the \texttt{parseReturn} function to instruct it
+how to deal with the data returned by the server. Often queries are made up of many `sequential' web requests. This is dealt with
+by chaining internal queries with internal callbacks using the same connection method demonstrated in the get score example.
+
+I am not going to go into too much detail in how this class was constructed, just the core implementation details because it seems
+as though every single part of the implementation has some kind of nuance. But I will finish by demonstrating the security and permissions
+mechanism:
+\begin{minted}{cpp}
+            QJSEngine engine;
+            QJSValue loc; Coordinate *coord = nullptr;
+            if (locationRunning) {
+                logger << "Enabling location for:" += baseURL;
+                coord = new Coordinate(locationSource->lastKnownPosition().coordinate());
+                loc = engine.newQObject(coord);
+                engine.globalObject().setProperty("m_location", loc);
+            }
+            QJSValue fun = engine.evaluate(*instr->data.js);
+            QJSValueList args;
+            args << *instr->userID << in;
+            QJSValue ret = fun.call(args);
+\end{minted}
+This is the code that runs the JS code on the phone. Notice the \texttt{locationRunning} boolean has to be set in order for the
+GPS coordinates to be instantiated. The instantiation of the GPS object is also predicated on that variable, which can only be activated
+when the user accepts the permissions. This is low level enforcement of the permission system.
+
 \subsubsection{Graphical User Interface}
-\section{Ethics}
+\subsection{Testing}
+\section{Responsible innovation}
+The system we have created has a range of ethical implications and societal effects that must be considered. We shall also outline possible
+security issues and how we have attempted to mittigate them.
+\subsection{Ethical Implications}
+We should consider what projects we allow users to contribute to through our app. It may be unethical for us to, for example, allow our
+users to work on projects that directly contribute to the manufacture, distribution, or use of on ethical products such as arms or tobacco.
+We must also ensure that users are fully aware of what a particular project is working towards. We should not allow a situation where a project
+may seem harmless (given a very limited description) but is really part of a wider project which users may not necessarily want to contribute to.
+Furthermore, a project that we allow users to contribute to may be completely benign, but if it is being carried out by a company that employs
+unethical practices elsewhere in its business, then we must consider whether we wish to support them by allowing their project on our platform.
+This is linked to §4.2.
+However, if we decide that we can determine what projects we offer and ban ones we disagree with from our service, one might consider this to mean
+that we actively support all projects we are offering and oppose all projects that we remove. This could lead to further issues if we have the
+option of hosting or banning projects linked to controversial issues.
+
+Our platform allows us to share sensor data from the user’s phone, and so this puts us in a position of responsibility. We should ensure that
+users are aware of exactly what their phone is doing and what they are contributing to when they choose projects to enable. This includes what,
+if any, data a project gathers from their phone and what it is used for. Furthermore, we should be able to guarantee to the user that our app
+does carry out exactly what the user is expecting it to. For example, a software bug may cause a user’s phone to be contributing to a project
+when it appears to be disabled to the user, and this would be a breach of trust, particularly if the user’s phone is mistakenly contributing
+to a project that they do not want to support.
+
+We have attempted to mitigate some of these issues by building a low level permissions system (more on this in §4.3) meaning that a user can
+know exactly what is required from the phone in terms of sensor data. Projects have to be hosted on the same computer as the main server
+allowing us to decide which projects can and cannot be run on phones. Although this still suffers from the endorsement issue highlighted in
+the second paragraph, we could allow all projects that fit our ethical code and explicitly state that we endorse none of them.
+
+\subsection{Social Effects}
+We hope that, if our platform were to be released and widely used, that it could bring awareness and computational resources to many positive
+projects and causes. We would be proud to have our platform support any project that aims to make a positive impact in the world, and to have
+a userbase that wishes to make a contribution in the form of donating their phones’ spare processing power. However, as mentioned in section
+4.1, we must be careful that our platform does not host or support projects that may serve a negative or harmful purpose, whether directly or
+indirectly.
+
+Whether our project could be used to bring about positive change is dependent upon what projects become available, but examples of projects
+that could be implemented (with arguable efficiency) include protein folding simulations (to aid cancer research), pulsar star analysis
+(to aid astrophysical research) and green energy load analysis (to make sure green energy sources are used whenever they can be).
+
+A possible downside of the app is that it may use more energy to solve these problems, but we argue that this is a non-issue. The app was
+written in C++ and after 4 weeks of continue testing with the primes experiment, it has consumed 0.7\% of our battery (average). This is
+negligible with respect to other apps on the phone. Super computing centres require huge amounts of cooling and energy. There is also the
+problem that not many super computing centres run these projects (if any) because the costs are too high and profits non-existent.
+
+\subsection{Data Security}
+We have made a number of security considerations when making this app:
+\begin{enumerate}
+  \item{Internal permissions}
+	\item{Low level security}
+  \item{User data policy}
+  \item{Use of Javascript}
+\end{enumerate}
+Internal permissions is the idea that default android permissions system is not fine grained enough. The app can request location and sensor
+permissions, but really we want each project to request permissions so that the user can have more control over the permission requirements of
+each project individually.
+
+This is then implemented with our low level security policy. The Javascript can only be exposed to a certain type of C++ object.
+If the permission is not consented by the user, the object relating to the sensor in question is never allocated memory. This way
+there is no way, even in the unlikely chance of a remote code execution vulnerability scenario, that an attack could access any data
+the user hasn't consented to. This is no help, however, if the user had consented to certain types of data. But we believe that most projects
+will not require sensor data meaning that though an attack is theoretically possible, in practice, it would be very hard.
+
+This low level permissions system means that if a project decided to need another permission and doesn't alert the users, the JS will break
+because it will require data that is unallocated on the phone.
+
+Another, very simple, approach to data security of users that we have taken is to store almost no data about each user. The data stored is
+a name, id and score. The name may as well be fake and duplicates are allowed; it isn't integral to the functioning of the app that this data
+be present or correct. We have no intention to store any more user data than this meaning  that in the unlikely event of a security breach,
+nothing private would be lost.
+
+When we say that we use javascript, we are not telling the full truth. We are using the full syntax of the language bit a very small
+subset of the default functions. This is intentional! There is no way to access any files, make web requests etc so that there is
+no way of crafting malicious JS. Any functionality over and above maths (such as accsessing location) has to be requested and is implemented
+by us so that there cannot be any undefined behaviour.
+
 \section{Group Member Contibutions}
 \subsection{Adam Nicholls}
 \subsection{George Chichirim}
 \subsection{James Hobson}
+I was team manager and in charge of the server and parts of the app that interfaced with the server. Although I was manger a priority of mine
+was to ensure that everyone had equal say in the design of the app. Once we had finished the planning stages, I took the plan verbatim and,
+much like the app itself, distributed small disjoint tasks to fellow members to try and make sure that everyone contributed fairly
+and had autonomy over their own parts of the project. It was very much a passive style of management.
+
+My programming contributions involved writing the server and \texttt{JSExecEngine}, the class that dealt with all server communication and
+running the JavaScript. With the class, my main focus was efficiency and an sticking to an aggressively asynchronous design pattern. This was
+because the class is used by almost all the other classes in the project and is run in the background every few seconds (depending on how its configured).
+For this reason, it was designed to use next to no memory and perform active memory management as it could be instantiated for hours, if not years!
+The asynchronous design pattern was because of the amount of web and sensor queries this app does. It would be wrong to block at any point because
+the class does nothing in a predictable amount of time!
 \subsection{Mihail Denkovski}
 \subsection{Minh Le Quoc}
 \end{document}
