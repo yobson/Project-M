@@ -355,7 +355,7 @@ we have done our best to test our app in a few ways. The first way is by using t
 This works out to be almost 100,000,000 exchanges between the mobile app and the server, most of which have been simultaneous. The results
 of both test projects have been monitored extensively and there has never been an incorrect result.
 
-Be we realise that waiting for a bug is not the way to go so have also created a test suit. Launching the app with certain command line
+We realise that waiting for a bug is not the way to go so have also created a test suit. Launching the app with certain command line
 arguments will open onto a page which connects to a different, local, test server and runs stress and accuracy tests in quick succession.
 If you want to try this out for yourself, head to the \texttt{tests} branch.
 
@@ -462,19 +462,47 @@ by us so that there cannot be any undefined behaviour.
 
 \section{Group Member Contibutions}
 \subsection{Adam Nicholls}
+As a member of the UI team, I was responsible for using Qt Creator to contribute to the development of a mobile app that will allow a user to
+run projects offered by the server. I spent a significant amount of time on some preliminary work that involved setting up Qt Creator and the
+Android emulator, familiarising myself with Qt, C++, and git, and gaining a working understanding of the existing code that other group members
+had written. I then was able to enhance functionality of the app in a number of ways.
+
+My first responsibility was to find a way for the app to remember the settings that a user selected for each individual project after leaving
+the project interface or closing the app altogether. I found that this could be done using Qt’s QSettings class. I thoroughly read up on the
+class, what it can do, and the best way to implement it. I then went on to make the necessary changes to projectwindow.cpp to allow the app
+to store and recall user settings.
+
+The main window (where available projects are listed) in the first iteration of our app simply contained a single list of all projects that
+were returned by the server, with the option to press one to be taken to its specific project settings page. I was tasked with making changes
+to this page that allowed the user to more easily see what projects they currently are and aren’t contributing to. I researched and experimented
+with several different approaches and decided to have the app display two separate lists - one for enabled projects and one for disabled ones.
+I was able to implement this by making the required changes to mainwindow.ui and mainwindow.cpp.
+
+In order to control how often a user’s phone contributes to a project, the project settings page contains a slider UI element that lets the user
+to select project frequency. I was able to make changes to the app that allowed this construct to be different for each project, rather than
+every project being forced to have frequency options of 30, 60, 120, and 300 seconds. To do this, I added to the Project class constructor
+\texttt{freq\_values} and \texttt{freq\_labels} parameters, which associate slider positions with a frequency value (in seconds) and a label
+to display to the user.
+
 \subsection{George Chichirim}
 \subsection{James Hobson}
-I was team manager and in charge of the server and parts of the app that interfaced with the server. Although I was manger a priority of mine
-was to ensure that everyone had equal say in the design of the app. Once we had finished the planning stages, I took the plan verbatim and,
+I was team manager and in charge of the server and parts of the app that interfaced with the server. Although I was manger, a priority of mine
+was to ensure that everyone had a say in the design of the app; although as the member with most experiance in industry, I decided which tools
+and frameworks (such as Qt) we would use as well as the general architecture. Once we had finished the planning stages, I took the plan verbatim and,
 much like the app itself, distributed small disjoint tasks to fellow members to try and make sure that everyone contributed fairly
-and had autonomy over their own parts of the project. It was very much a passive style of management.
+and had autonomy over their own parts of the project. It was very much a passive style of management, making sure that member had development freedom
+within the specifications we agreed on and motiviating the group to work. I also gave lessons to members on how to use git.
 
 My programming contributions involved writing the server and \texttt{JSExecEngine}, the class that dealt with all server communication and
 running the JavaScript. With the class, my main focus was efficiency and an sticking to an aggressively asynchronous design pattern. This was
 because the class is used by almost all the other classes in the project and is run in the background every few seconds (depending on how its configured).
 For this reason, it was designed to use next to no memory and perform active memory management as it could be instantiated for hours, if not years!
 The asynchronous design pattern was because of the amount of web and sensor queries this app does. It would be wrong to block at any point because
-the class does nothing in a predictable amount of time!
+the class does nothing in a predictable amount of time given its predication on web requests. I designed a build system using autotools
+with autodetection where possible so that we could automate builds. Although I did build an automatic build server, it never managed to 
+produce builds that would install on phones. Google wisely never gives a reason why an install fails, my best guess is that it was signed for debugging
+so wouldn't install when downloaded from the web. The autobuild server was scaped in the end. If you would like more detail about my cotributions
+technically, read §1.3, §1.4, §2, §3.1.*, §3.2.2, §3.3 (unit testing bit) and §5.3 as these were my personal technical responcibilities.
 \subsection{Mihail Denkovski}
 \subsection{Minh Le Quoc}
 \end{document}
