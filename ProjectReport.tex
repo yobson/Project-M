@@ -390,6 +390,27 @@ GPS coordinates to be instantiated. The instantiation of the GPS object is also 
 when the user accepts the permissions. This is low level enforcement of the permission system.
 
 \subsubsection{Graphical User Interface}
+The Graphical User Interface was written in C++ using the Qt framework. It consist of two main screens:
+
+The main screen consists of two ListViews representing the enabled and disabled projects, the user score and a refresh button. The ListViews are used with the model-view-controller pattern. This is done by passing the data to a model which provides it to the view:
+\begin{minted}{cpp}
+    project_list_model_en->setStringList(*project_name_list);
+    ui->proj_list_view_en->setModel(project_list_model);    
+\end{minted}
+The clicks are handled by slots which are normal C++ functions connected to an object and await a particular signal. In this case, upon receiving a click, the project name is extracted and the details are opened in a new ProjectWindow. The ProjectWindow is populated with data passed to its initiallizer.
+
+Data for the ListViews as well as the score is handled by signals and slots which are a central feature of Qt. Signals are emitted when an object is changed in a way which might require an UI change. Slots are then activated by an appropriate signal and handle the received data.
+
+Projects are represented by an object class written using latest C++ guidelines and style. In particular,
+classes are encapsulated, the properties are split between public and private and the definition and implementation is split between .h and .cpp files. Class functions are defined using autos and lambdas which improve code clarity. Getters and setters are not the natural paradigm in C++. Instead, properties which are supposed to only have a getter, i.e. are read-only would have a "getter" of the following type:
+\begin{minted}{cpp}
+    auto name() -> const QString&;
+\end{minted}
+While properties which are meant to have both getters and setters would have the following:
+\begin{minted}{cpp}
+    auto enabled() -> bool&;
+\end{minted}
+which returns a reference through which the value can be read and written. 
 \subsection{Testing}
 Testing the application was hard given that the specification of each project is up to the creator of the project itself. Having said this,
 we have done our best to test our app in a few ways. The first way is by using the app. We have been running the app for (as of writing)
@@ -546,6 +567,28 @@ produce builds that would install on phones. Google wisely never gives a reason 
 so wouldn't install when downloaded from the web. The autobuild server was scaped in the end. If you would like more detail about my cotributions
 technically, read §1.3, §1.4, §2, §3.1.*, §3.2.2, §3.3 (unit testing bit) and §5.3 as these were my personal technical responsibilities.
 \subsection{Mihail Denkovski}
+I was on the UI team and used C++ and the Qt framework in QtCreator. I worked on making the initial parts of the front-end app and its screens. I made the main screen and the project screen where we show the details about projects as well as the object class representing a project. Since we were starting a project from scratch I put effort into using all the latest C++ and Qt features as well as writing the code with appropriate design patterns and coding style. 
+
+Firstly, I made the object classes so that they are cleanly encapsulated and their properties are split between public and private as appropriate. Furthermore, the definition and implementation is divided between .h and .cpp files. 
+
+Secondly, I defined object functions in terms of autos and lambdas for better readability. Furthermore, I made the getters and setters in a style more natural to C++. Properties which are supposed to only have a getter, i.e. are read-only would have a "getter" of the following type:
+\begin{minted}{cpp}
+    auto name() -> const QString&;
+\end{minted}
+While properties which are meant to have both getters and setters would have the following:
+\begin{minted}{cpp}
+    auto enabled() -> bool&;
+\end{minted}
+which returns a reference through which the value can be read and written.
+
+Thirdly, I decided to use a MVC approach for the widgets in the UI. For example, the projects are shown in a ListView. This is done by passing the data to a model which provides it to the view:
+\begin{minted}{cpp}
+    project_list_model_en->setStringList(*project_name_list);
+    ui->proj_list_view_en->setModel(project_list_model);    
+\end{minted}
+The clicks are handled by slots which are normal C++ functions connected to an object and await a particular signal. In this case, upon receiving a click, the project name is extracted and the details are opened in a new ProjectWindow.
+
+Finally, I did some minor corrections and fixes. For example, I added a score view and connected it to the back-end. This was again done using a Slot which awaits for a signal at which point the label is updated.
 \subsection{Minh Le Quoc}
 I was assigned into the Android Service Team of the App. An Overview of the Scheduling is that the service function is triggered every 30 seconds to 10 minutes (set by the programmer). After we finished the Scheduling part, we realized that there is a problem with the app. Our intention was that the app will be working on the background. When we open the app, the service should start to run and it should continue running even when we exit the app. However, once we closed the UI of the app, the service would become inactive and get closed by android. So we come up with some solutions.
 
