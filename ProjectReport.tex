@@ -23,7 +23,7 @@
 \begin{quote}
   \textbf{Project M: Put your phone to work}
 
-When people browse social media sites on their phones for hours every day, most of the CPU power goes unused. The old desktop equivalent of this problem was the screensaver, which did little of value until it was co-opted for distributed computing projects such as SETI@home. Your task is to make a platform that can perform useful computation in the background on a large number of mobile phones, while the owners are on social media - or even while they are asleep. It will have to run cross-platform, perhaps using JavaScript, but must also give the appropriate incentives to users - will it drain batteries or incur network charges? If so, what kind of application would customers pay to run on such a platform? Would phone sensors offer any specific value? You need to demonstrate an end-to-end solution including servers, mobile clients and an example application, keeping in mind the security implications if either customers or phone owners try to cheat the system.
+When people browse social media sites on their phones for hours every day, most of the CPU power goes unused. The old desktop equivalent of this problem was the screen saver, which did little of value until it was co-opted for distributed computing projects such as SETI@home. Your task is to make a platform that can perform useful computation in the background on a large number of mobile phones, while the owners are on social media - or even while they are asleep. It will have to run cross-platform, perhaps using JavaScript, but must also give the appropriate incentives to users - will it drain batteries or incur network charges? If so, what kind of application would customers pay to run on such a platform? Would phone sensors offer any specific value? You need to demonstrate an end-to-end solution including servers, mobile clients and an example application, keeping in mind the security implications if either customers or phone owners try to cheat the system.
 
 [Project in collaboration with G-Research]
 \end{quote}
@@ -105,8 +105,8 @@ If you want to host a ProjectM server, their are 3 things you have to consider:
 
 Firstly, setting up the server is easy. As long as the \texttt{.cgi} files are in the appropriate place with respect
 to your webserver software of choice, for example, in our setup (FreeBSD \& Apache), all of the compiled server files and
-projects live in \texttt{/usr/local/www/apache24/cgi-bin/}. It must be the case that all of the \texttt{.cgi} files can 
-\textit{accsessed} from a web address in the following format `\texttt{base-addr.something/cgi-bin/*.cgi}' Make sure redis is installed!
+projects live in \texttt{/usr/local/www/apache24/cgi-bin/}. It must be the case that all of the \texttt{.cgi} files can be
+\textit{accessed} from a web address in the following format `\texttt{base-addr.something/cgi-bin/*.cgi}' Make sure redis is installed!
 
 The ProjectM configuration file is a text file that lists all of the projects in Haskell tuple format.
 Here is an example file:
@@ -173,7 +173,7 @@ are used to update the state and return input to the phone.
 \section{Project Structure}
 The execution of this task is most certainly open to interpretation and fortunately we had the freedom to choose whichever
 approach we deemed appropriate given the time restraints. In this section I will outline the general structure of the project as well
-as what our aims were when designing. Figure  is a UML(ish) diagram showing all of the different parts of our app.
+as what our aims were when designing. Figure is a UML(ish) diagram showing all of the different parts of our app.
 \begin{figure}[h]
   \caption{Diagram describing the structure of the project}
   \centering
@@ -198,7 +198,7 @@ The mobile app is made up of the following parts:
 \begin{itemize}
   \item{Javascript Execution Engine - Deals with all communication between the phone and the server.}
   \item{GUI - The display of the app}
-  \item{Background Service - The scheduler and executer of tasks}
+  \item{Background Service - The scheduler and executor of tasks}
 \end{itemize}
 The app was constructed in C++ using the Qt library. This was chosen because it is cross-platform, allowing us with little additional effort, compile for
 every platform. On top of this, with the knowledge that this app was to be running full time in the background of the user's phone, it was crucial to
@@ -211,8 +211,8 @@ many places and so it is suggested that you read that first.
 The server is comprised of a user management and project hosting \texttt{CGI} executable and a library that creates project \texttt{CGI} executables.
 In order to understand how both work we will need to be fluent in Haskell and know what redis is. Haskell was used for two reasons. The first is that
 it is very type safe and has no mutable state making our server code far less prone to errors. The next reason is we wanted the projects to be
-programed in Haskell for the same reason! The two sections (described blow) are in no way linked (other than they share a redis server) and so
-could have been programmed in two different languages, but it seemed far more readbale to keep all server code in one language.
+programmed in Haskell for the same reason! The two sections (described blow) are in no way linked (other than they share a redis server) and so
+could have been programmed in two different languages, but it seemed far more readable to keep all server code in one language.
 
 \subsubsection{User Management and Project Hosting}
 The code is found in \texttt{\$PROJECT\_ROOT/Server/main.hs}. Haskell seems like an interesting choice of language for web programming as
@@ -241,7 +241,7 @@ redis monad, this is then given to us in an \mintinline{haskell}{RedisCtx m f =>
 back into our preferred \mintinline{haskell}{IO (Maybe a)} type.
 
 Finally, when sending data back to the phone, the standard we decided to use is \texttt{JSON}. For this reason, the type class \texttt{JSON}
-has been defined and for every type that is serialised and sent to the phone, there is an instance of the function \texttt{jsonify}.
+has been defined and for every type that is serialized and sent to the phone, there is an instance of the function \texttt{jsonify}.
 
 \subsubsection{ProjectM Library}
 The ProjectM library is a library that must be used to create a project that can run on our platform and the code is found at
@@ -259,10 +259,52 @@ score whenever they submit an answer, exposes data types needed to implement the
 and types for permissions.
 
 \subsection{Mobile App}
-The app can be be split into a number of distinct parts. The Service is responcible for scheduling runs of the \texttt{JSExecEngine} and is
+The app can be be split into a number of distinct parts. The Service is responsible for scheduling runs of the \texttt{JSExecEngine} and is
 configured by the GUI. These are the fundamental building blocks of the app.
 
 \subsubsection{Service}
+The Service is a background program that needs to schedule runs of the projects according to their own settings and use the \texttt{JSExecEngine} to run them asynchronously. It needs be in perfect coordination with the GUI part where the user can select different configurations for different projects. Unfortunately, every platform handles services differently, and so the Service code needs to be rewritten on every platform. The Android one goes as following:
+
+Firstly, in the \texttt{main.cpp} when the app is started it tries to run the service by the following call:
+\begin{minted}{cpp}
+QAndroidJniObject::callStaticMethod<void>("space/hobson/ProjectM/MService", "startMService",
+        "(Landroid/content/Context;)V", QtAndroid::androidActivity().object());
+\end{minted}
+
+\begin{wrapfigure}[12]{R}{0.4\textwidth}
+  \centering
+  \includegraphics[width=0.4\textwidth]{DocFiles/notification.png}
+  \caption{Notification bar}
+\end{wrapfigure}
+
+The \texttt{QAndroidJniObject::callStaticMethod} is a function that allows you to call Java functions. It takes the class path, the method name that we want to call, its signature, and the arguments for this method. Here we call the function \texttt{startMService} from the \texttt{MService} class, passing it the current activity. This method is implemented in Java and once called will start the Java Service and will display a notification that lets the user know that projects are running in the background. This service must keep running even though the app is killed.
+
+The C++ implementation of the Service can be found in \texttt{service.h} and \texttt{service.cpp}. There are also \texttt{projectsettings.h} and \texttt{projectsettings.cpp} that contain a lot of constants which will help us to write and read the project settings here and in GUI much easier. The Service works as follow: it triggers every \texttt{ProjectSettings::CHECKING\_FREQ} milliseconds and checks for projects to run. We chose this design because the project settings are quite complex (e.g. Plugged In only or WiFi only) and they can be changed anytime, so this would make the individual scheduling of projects quite impossible. We decided that checking all projects every \texttt{ProjectSettings::CHECKING\_FREQ} milliseconds is the best way.
+
+The project settings are stored using the Qt's \texttt{QSettings} and the constants from \texttt{projectsettings.h}. Apart of these settings which are shared between the Service and the GUI, the Service keeps track of another \texttt{QSettings} file that stores the last times every project was run. There is also a Hash Table \texttt{projectEngines} that keeps track of pointers to instantiated \texttt{JSExecEngine} objects corresponding to the projects.
+
+When the Service is triggered, it goes through every project from the settings file and calls the following function:
+
+\begin{minted}{cpp}
+bool shouldRun(QSettings &project, QSettings &lastRun, QString &projectName)
+\end{minted}
+
+This will determine if the project should be run now by analyzing all the settings of this project. Here we need to write Java functions that will offer information about the phone:
+
+\begin{minted}{java}
+public static boolean isWiFiConnected(Context context)
+public static boolean isCharging(Context context)
+public static int batteryLevel(Context context)
+\end{minted}
+
+And again use the \texttt{QAndroidJniObject::callStaticMethod} to call these methods. If the \texttt{shouldRun} decides that this project should be run then we call the following function that will use the corresponding \texttt{JSExecEngine} object to run the project asynchronously:
+
+\begin{minted}{cpp}
+void Service::runProject(QString &projectName, QSettings &settings)
+\end{minted}
+
+All through development the Service was continuously tested with sample test data made of all combinations of settings, and since its finalization with live data.
+
 \subsubsection{Java Script Execution Engine}
 The Java Script execution engine (found in \texttt{jsexecengine.cpp} and \texttt{jsexecengine.h}) is a class designed to be the bridge between
 the server and the rest of the app. It's job is to deal with all server communication as well as executing the JS code on the phone.
@@ -271,20 +313,20 @@ I will begin by describing how the object is instantiated and used. The object i
   JSExecEngine *engine = new JSExecEngine(baseAddress, projectExt, parent, editor);
 \end{minted}
 The \texttt{baseAddress} is the only necessary parameter; the rest have defaults. The base address is the server address such that
-\texttt{baseAddress/bin-cgi/} is the directory with the projects and main server app in. The project extention is the name of the
+\texttt{baseAddress/bin-cgi/} is the directory with the projects and main server app in. The project extension is the name of the
 \texttt{cgi} executable (with \texttt{.cgi} extension) of the project it is concerned with (for example \texttt{Primes.cgi}).
 The parent is the \texttt{QObject} parent, although not necessary, it does mean that there is elementary garbage collection if
 it is instantiated in a tree of \texttt{QObjects}. This is more of a precaution than a necessity, a \texttt{JSExecEngine} object
 should be deleted whenever it is done with. The \texttt{editor} is another optional parameter used only in the \texttt{testpage}
 class which allows for all logs to be redirected to the screen for testing purposes.
 
-The object is then used using queries and dynamically dispached callbacks. Luckily, the dynamic callbacks are implemented as part
+The object is then used using queries and dynamically dispatched callbacks. Luckily, the dynamic callbacks are implemented as part
 of the Qt framework. The following queries are available (implemented as public functions):
 \begin{minted}{cpp}
 void exists_user(QString userID); //Check to see if user exists with certain ID
 void register_user(QString firstName, QString lastName); //Register a new user
-void get_projects(); //Get list of avalable projects to run.
-void run_project(); //run the selected project (seleced when instantiated with projectExt)
+void get_projects(); //Get list of available projects to run.
+void run_project(); //run the selected project (selected when instantiated with projectExt)
 void get_score(); //Get user's score
 void get_permissions(); //Get permissions needed by selected project
 \end{minted}
@@ -355,7 +397,7 @@ we have done our best to test our app in a few ways. The first way is by using t
 This works out to be almost 100,000,000 exchanges between the mobile app and the server, most of which have been simultaneous. The results
 of both test projects have been monitored extensively and there has never been an incorrect result.
 
-We realise that waiting for a bug is not the way to go so have also created a test suit. Launching the app with certain command line
+We realised that waiting for a bug is not the way to go so have also created a test suit. Launching the app with certain command line
 arguments will open onto a page which connects to a different, local, test server and runs stress and accuracy tests in quick succession.
 If you want to try this out for yourself, head to the \texttt{tests} branch.
 
@@ -385,7 +427,7 @@ If we had more time to develop this project, we would achieve done the following
 
 \section{Responsible innovation}
 The system we have created has a range of ethical implications and societal effects that must be considered. We shall also outline possible
-security issues and how we have attempted to mittigate them.
+security issues and how we have attempted to mitigate them.
 \subsection{Ethical Implications}
 We should consider what projects we allow users to contribute to through our app. It may be unethical for us to, for example, allow our
 users to work on projects that directly contribute to the manufacture, distribution, or use of unethical products such as arms or tobacco.
@@ -457,10 +499,10 @@ nothing private would be lost.
 
 When we say that we use javascript, we are not telling the full truth. We are using the full syntax of the language bit a very small
 subset of the default functions. This is intentional! There is no way to access any files, make web requests etc so that there is
-no way of crafting malicious JS. Any functionality over and above maths (such as accsessing location) has to be requested and is implemented
+no way of crafting malicious JS. Any functionality over and above maths (such as accessing location) has to be requested and is implemented
 by us so that there cannot be any undefined behaviour.
 
-\section{Group Member Contibutions}
+\section{Group Member Contributions}
 \subsection{Adam Nicholls}
 As a member of the UI team, I was responsible for using Qt Creator to contribute to the development of a mobile app that will allow a user to
 run projects offered by the server. I spent a significant amount of time on some preliminary work that involved setting up Qt Creator and the
@@ -474,7 +516,7 @@ to store and recall user settings.
 
 The main window (where available projects are listed) in the first iteration of our app simply contained a single list of all projects that
 were returned by the server, with the option to press one to be taken to its specific project settings page. I was tasked with making changes
-to this page that allowed the user to more easily see what projects they currently are and aren’t contributing to. I researched and experimented
+to this page that allowed the user to more easily see what projects they currently are and aren't contributing to. I researched and experimented
 with several different approaches and decided to have the app display two separate lists - one for enabled projects and one for disabled ones.
 I was able to implement this by making the required changes to mainwindow.ui and mainwindow.cpp.
 
@@ -487,11 +529,11 @@ to display to the user.
 \subsection{George Chichirim}
 \subsection{James Hobson}
 I was team manager and in charge of the server and parts of the app that interfaced with the server. Although I was manger, a priority of mine
-was to ensure that everyone had a say in the design of the app; although as the member with most experiance in industry, I decided which tools
+was to ensure that everyone had a say in the design of the app; although as the member with most experience in industry, I decided which tools
 and frameworks (such as Qt) we would use as well as the general architecture. Once we had finished the planning stages, I took the plan verbatim and,
 much like the app itself, distributed small disjoint tasks to fellow members to try and make sure that everyone contributed fairly
 and had autonomy over their own parts of the project. It was very much a passive style of management, making sure that member had development freedom
-within the specifications we agreed on and motiviating the group to work. I also gave lessons to members on how to use git.
+within the specifications we agreed on and motivating the group to work. I also gave lessons to members on how to use git.
 
 My programming contributions involved writing the server and \texttt{JSExecEngine}, the class that dealt with all server communication and
 running the JavaScript. With the class, my main focus was efficiency and an sticking to an aggressively asynchronous design pattern. This was
@@ -502,7 +544,12 @@ the class does nothing in a predictable amount of time given its predication on 
 with autodetection where possible so that we could automate builds. Although I did build an automatic build server, it never managed to 
 produce builds that would install on phones. Google wisely never gives a reason why an install fails, my best guess is that it was signed for debugging
 so wouldn't install when downloaded from the web. The autobuild server was scaped in the end. If you would like more detail about my cotributions
-technically, read §1.3, §1.4, §2, §3.1.*, §3.2.2, §3.3 (unit testing bit) and §5.3 as these were my personal technical responcibilities.
+technically, read §1.3, §1.4, §2, §3.1.*, §3.2.2, §3.3 (unit testing bit) and §5.3 as these were my personal technical responsibilities.
 \subsection{Mihail Denkovski}
 \subsection{Minh Le Quoc}
+I was assigned into the Android Service Team of the App. An Overview of the Scheduling is that the service function is triggered every 30 seconds to 10 minutes (set by the programmer). After we finished the Scheduling part, we realized that there is a problem with the app. Our intention was that the app will be working on the background. When we open the app, the service should start to run and it should continue running even when we exit the app. However, once we closed the UI of the app, the service would become inactive and get closed by android. So we come up with some solutions.
+
+The first one is that we want a service that starts at boot time and then runs forever independently of the app. In the worst case, if the user doesn't want to run anything then the service will check every X minutes and it will not find anything to run. Ultimately, we can make a button on the app Start the service and Stop the Service for the user to decide. However, it will concern with the ethical part of the app as running a service at boot time without any notification or the permission from the user is ethically wrong. So I come up with another solution.
+
+Instead of making the service runs from the start and including the Start and Stop the Service buttons inside the app, the app behaves the same way as a music player app, which shows a notification on top and even when we close the app the notification still persists and in turn, keeps the project alive.
 \end{document}
