@@ -16,7 +16,7 @@
 \setminted{autogobble}
 \usemintedstyle{tango}
 
-\title{Project M -- Report}
+\title{Project M -- Documentation}
 \author{Adam Nicholls, George Chichirim, James Hobson, \\ Mihail Denkovski and Minh Le Quoc}
 
 \begin{document}
@@ -549,6 +549,16 @@ every project being forced to have frequency options of 30, 60, 120, and 300 sec
 to display to the user.
 
 \subsection{George Chichirim}
+I was part of the App Service Team. The aim of this team was to make a service that runs in background and schedules all the projects to run according to their own settings. My contribution is split into two parts: researching and then implementing the service. At the beginning I spent a bit of time familiarizing with Qt Framework and GitHub. Then I spent a fair amount of time understanding the existing code that other group members had written and thinking how to fit best the Service in the existing code. After this, I made a lot of research (which took more than half of my time spent on this project) on the Qt API, on how to start and run a background service that doesn't stop when the app is killed, on how to schedule it, and on how to integrate it with the Qt Framework. The outcome of this research was that we can't use Qt's Service as it will stop working once we close the app, and that every platform handles services differently. This means that the actual service can't be cross-platform and it needs native implementations for every platform. Because I have an Android phone I decided to write the service on Android. At this point I had to do more research on JNI and Qt's API: how to call Java functions from Qt Framework and how to integrate them with Qt.
+
+After all this research, I finally could start coding. Firstly, I implemented a Java class that deals with starting the service and which, subsequently, was extended to start the notification too. This class is integrated with Qt by extending \texttt{QtService} (need to import some Qt's android helping library), and by adding correctly the service into the \texttt{AndroidManifest.xml}. I also implemented three Java functions that offer information about the phone (whether it is connected to WiFi or plugged in, and battery level). These functions can be called from Qt Framework using \texttt{QAndroidJniObject::callStaticMethod} function.
+
+Secondly, I implemented the C++ side of the Service. It consists of \texttt{service.h} and \texttt{service.cpp} which contain the service triggering, analyzing projects settings together with phone information in order to decide if the project should be run, running the projects, and storing the information needed optimally to make the service time and space efficient (storing pointers to the \texttt{JSExecEngine} instantiated objects in order to have only one instantation per project, and not doing it every time the project should be run, which would cause a huge amount of memory usage). I also added \texttt{projectsettings.h} and \texttt{projectsettings.cpp} which contain constants for the setting predicates that will help with storing and reading the settings and be more organized in the synchronization between Service part and GUI part.
+
+Initially, I used Json files for storing the settings, but after Adam found QSettings I reimplemented the way I was handling the settings data to use QSettings, and I updated GUI's way of storing the data to use \texttt{projectsettings.h} in order to make a perfect Inter Process Communication between the Service and GUI.
+
+All through development I continuously tested the Service with sample test data made of all combinations of settings, and since its finalization it has been tested with live data. More technical details about how the Service works can be seen under the Service section of our product documentation we wrote.
+
 \subsection{James Hobson}
 I was team manager and in charge of the server and parts of the app that interfaced with the server. Although I was manger, a priority of mine
 was to ensure that everyone had a say in the design of the app; although as the member with most experience in industry, I decided which tools
