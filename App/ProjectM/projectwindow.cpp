@@ -9,7 +9,7 @@
 #include <vector>
 #include <algorithm>
 #include <QMessageBox>
-#import "magic.h"
+#include "magic.h"
 
 
 ProjectWindow::ProjectWindow(Project *project, QWidget *parent) :

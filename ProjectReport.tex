@@ -10,6 +10,7 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{wrapfig}
+\usepackage{verbatim}
 
 \setmonofont{Fira Code}
 \setminted{autogobble}
@@ -595,4 +596,5 @@ I was assigned into the Android Service Team of the App. An Overview of the Sche
 The first one is that we want a service that starts at boot time and then runs forever independently of the app. In the worst case, if the user doesn't want to run anything then the service will check every X minutes and it will not find anything to run. Ultimately, we can make a button on the app Start the service and Stop the Service for the user to decide. However, it will concern with the ethical part of the app as running a service at boot time without any notification or the permission from the user is ethically wrong. So I come up with another solution.
 
 Instead of making the service runs from the start and including the Start and Stop the Service buttons inside the app, the app behaves the same way as a music player app, which shows a notification on top and even when we close the app the notification still persists and in turn, keeps the project alive.
+
 \end{document}
